@@ -1,7 +1,18 @@
+# Server (Python/FastAPI)
 server/.env
 server/venv/
 server/__pycache__/
 server/*.pyc
+server/**/__pycache__/
+server/.pytest_cache/
+
+# Client (React/Vite) - some of these will apply once client/ is scaffolded
 client/node_modules/
 client/dist/
+client/.env
+client/.env.local
+
+# Editor/OS
+.vscode/
 .DS_Store
+Thumbs.db

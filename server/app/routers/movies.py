@@ -45,12 +45,18 @@ def list_movies(
     db: Session = Depends(get_db),
     trending: bool | None = None,
     featured: bool | None = None,
+    genre_id: str | None = None,
+    search: str | None = None,
 ):
     query = db.query(models.Movie)
     if trending is not None:
         query = query.filter(models.Movie.is_trending == trending)
     if featured is not None:
         query = query.filter(models.Movie.is_featured == featured)
+    if genre_id is not None:
+        query = query.filter(models.Movie.genres.any(models.Genre.id == genre_id))
+    if search is not None:
+        query = query.filter(models.Movie.title.ilike(f"%{search}%"))
     return query.all()
 
 

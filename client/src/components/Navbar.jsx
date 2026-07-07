@@ -20,9 +20,14 @@ export default function Navbar({ onSearch }) {
 
   return (
     <div className="flex items-center justify-between px-4 md:px-8 py-4 sticky top-0 bg-linear-to-b from-black to-transparent z-10">
-      <Link to="/browse" className="text-red-600 text-2xl font-bold tracking-wide">
-        FLIXTAPE
-      </Link>
+      <div className="flex items-center gap-6">
+        <Link to="/browse" className="text-red-600 text-2xl font-bold tracking-wide">
+          FLIXTAPE
+        </Link>
+        <Link to="/my-list" className="text-neutral-300 hover:text-white text-sm">
+          My List
+        </Link>
+      </div>
 
       <div className="flex items-center gap-4">
         <input

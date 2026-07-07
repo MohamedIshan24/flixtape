@@ -3,8 +3,9 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Profiles from './pages/Profiles'
 import Browse from './pages/Browse'
-import ProtectedRoute from './components/ProtectedRoute'
 import MovieDetail from './pages/MovieDetail'
+import MyList from './pages/MyList'
+import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
   return (
@@ -33,6 +34,14 @@ function App() {
           element={
             <ProtectedRoute>
               <MovieDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-list"
+          element={
+            <ProtectedRoute>
+              <MyList />
             </ProtectedRoute>
           }
         />

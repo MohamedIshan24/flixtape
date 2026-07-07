@@ -1,10 +1,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import { getMovies } from '../api/movies'
 import { getGenres } from '../api/genres'
+import { getWatchHistory } from '../api/watchHistory'
+import { useProfiles } from '../context/ProfileContext'
 import Navbar from '../components/Navbar'
 import MovieRow from '../components/MovieRow'
 
 export default function Browse() {
+  const { activeProfile } = useProfiles()
+  const [continueWatching, setContinueWatching] = useState([])
   const [trending, setTrending] = useState([])
   const [featured, setFeatured] = useState([])
   const [genres, setGenres] = useState([])
@@ -16,11 +20,13 @@ export default function Browse() {
     async function loadHome() {
       setIsLoading(true)
       try {
-        const [trendingRes, featuredRes, genresRes] = await Promise.all([
+        const [historyRes, trendingRes, featuredRes, genresRes] = await Promise.all([
+          getWatchHistory(activeProfile.id),
           getMovies({ trending: true }),
           getMovies({ featured: true }),
           getGenres(),
         ])
+        setContinueWatching(historyRes.data)
         setTrending(trendingRes.data)
         setFeatured(featuredRes.data)
         setGenres(genresRes.data)
@@ -39,8 +45,8 @@ export default function Browse() {
         setIsLoading(false)
       }
     }
-    loadHome()
-  }, [])
+    if (activeProfile) loadHome()
+  }, [activeProfile])
 
   const handleSearch = useCallback(async (query) => {
     if (!query.trim()) {
@@ -93,6 +99,7 @@ export default function Browse() {
             </div>
           )}
 
+          <MovieRow title="Continue Watching" movies={continueWatching} showProgress />
           <MovieRow title="Trending Now" movies={trending} />
           <MovieRow title="Featured" movies={featured} />
           {genres.map((genre) => (

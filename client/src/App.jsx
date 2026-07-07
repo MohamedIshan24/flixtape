@@ -4,6 +4,7 @@ import Signup from './pages/Signup'
 import Profiles from './pages/Profiles'
 import Browse from './pages/Browse'
 import ProtectedRoute from './components/ProtectedRoute'
+import MovieDetail from './pages/MovieDetail'
 
 function App() {
   return (
@@ -24,6 +25,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Browse />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/movie/:movieId"
+          element={
+            <ProtectedRoute>
+              <MovieDetail />
             </ProtectedRoute>
           }
         />

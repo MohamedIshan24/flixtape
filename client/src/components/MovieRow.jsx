@@ -1,4 +1,8 @@
+import { useNavigate } from 'react-router-dom'
+
 export default function MovieRow({ title, movies }) {
+  const navigate = useNavigate()
+
   if (!movies || movies.length === 0) return null
 
   return (
@@ -8,6 +12,7 @@ export default function MovieRow({ title, movies }) {
         {movies.map((movie) => (
           <div
             key={movie.id}
+            onClick={() => navigate(`/movie/${movie.id}`)}
             className="shrink-0 w-40 md:w-48 cursor-pointer group"
           >
             <div className="aspect-video bg-neutral-800 rounded overflow-hidden group-hover:ring-2 ring-white transition">

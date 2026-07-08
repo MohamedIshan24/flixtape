@@ -5,7 +5,9 @@ import Profiles from './pages/Profiles'
 import Browse from './pages/Browse'
 import MovieDetail from './pages/MovieDetail'
 import MyList from './pages/MyList'
+import AdminDashboard from './pages/AdminDashboard'
 import ProtectedRoute from './components/ProtectedRoute'
+import AdminRoute from './components/AdminRoute'
 
 function App() {
   return (
@@ -42,6 +44,16 @@ function App() {
           element={
             <ProtectedRoute>
               <MyList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
             </ProtectedRoute>
           }
         />

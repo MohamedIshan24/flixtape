@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useProfiles } from '../context/ProfileContext'
+import { useAuth } from '../context/AuthContext'
 
 export default function Navbar({ onSearch }) {
   const { activeProfile, clearActiveProfile } = useProfiles()
+  const { user } = useAuth()
   const [query, setQuery] = useState('')
   const navigate = useNavigate()
 
@@ -27,6 +29,11 @@ export default function Navbar({ onSearch }) {
         <Link to="/my-list" className="text-neutral-300 hover:text-white text-sm">
           My List
         </Link>
+        {user?.role === 'admin' && (
+          <Link to="/admin" className="text-neutral-300 hover:text-white text-sm">
+            Admin
+          </Link>
+        )}
       </div>
 
       <div className="flex items-center gap-4">

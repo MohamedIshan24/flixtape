@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import ReactPlayer from 'react-player'
 import { getMovie } from '../api/movies'
@@ -16,8 +16,22 @@ export default function MovieDetail() {
   const [isLoading, setIsLoading] = useState(true)
   const [startTime, setStartTime] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [selectedSeasonId, setSelectedSeasonId] = useState(null)
+  const [selectedEpisodeId, setSelectedEpisodeId] = useState(null)
 
   const lastSavedRef = useRef(0)
+
+  const isSeries = movie?.type === 'series'
+
+  const selectedSeason = useMemo(
+    () => movie?.seasons?.find((s) => s.id === selectedSeasonId) || null,
+    [movie, selectedSeasonId]
+  )
+
+  const selectedEpisode = useMemo(
+    () => selectedSeason?.episodes?.find((e) => e.id === selectedEpisodeId) || null,
+    [selectedSeason, selectedEpisodeId]
+  )
 
   useEffect(() => {
     async function load() {
@@ -28,12 +42,33 @@ export default function MovieDetail() {
           getMyList(activeProfile.id),
           getWatchHistory(activeProfile.id),
         ])
-        setMovie(movieRes.data)
+        const movieData = movieRes.data
+        setMovie(movieData)
         setIsInMyList(listRes.data.some((entry) => entry.movie.id === movieId))
 
-        const existingProgress = historyRes.data.find((entry) => entry.movie.id === movieId)
-        if (existingProgress) {
-          setStartTime(existingProgress.progress_seconds)
+        const historyForMovie = historyRes.data.filter((entry) => entry.movie.id === movieId)
+
+        if (movieData.type === 'series' && movieData.seasons?.length > 0) {
+          const episodeHistory = historyForMovie.find((entry) => entry.episode_id)
+          if (episodeHistory) {
+            const season = movieData.seasons.find((s) =>
+              s.episodes.some((e) => e.id === episodeHistory.episode_id)
+            )
+            if (season) {
+              setSelectedSeasonId(season.id)
+              setSelectedEpisodeId(episodeHistory.episode_id)
+              setStartTime(episodeHistory.progress_seconds)
+            }
+          } else {
+            const firstSeason = movieData.seasons[0]
+            setSelectedSeasonId(firstSeason.id)
+            setSelectedEpisodeId(firstSeason.episodes[0]?.id || null)
+          }
+        } else {
+          const plainHistory = historyForMovie.find((entry) => !entry.episode_id)
+          if (plainHistory) {
+            setStartTime(plainHistory.progress_seconds)
+          }
         }
       } catch (err) {
         console.error('Failed to load movie detail', err)
@@ -44,17 +79,28 @@ export default function MovieDetail() {
     if (activeProfile) load()
   }, [movieId, activeProfile])
 
+  function handleSelectEpisode(seasonId, episodeId) {
+    setSelectedSeasonId(seasonId)
+    setSelectedEpisodeId(episodeId)
+    setStartTime(0)
+    lastSavedRef.current = 0
+    setIsPlaying(false)
+  }
+
   const handleProgress = useCallback(
     (state) => {
       const seconds = Math.floor(state.playedSeconds)
       if (Math.abs(seconds - lastSavedRef.current) >= 10) {
         lastSavedRef.current = seconds
-        upsertWatchHistory(activeProfile.id, movieId, seconds).catch((err) =>
-          console.error('Failed to save watch progress', err)
-        )
+        upsertWatchHistory(
+          activeProfile.id,
+          movieId,
+          seconds,
+          isSeries ? selectedEpisodeId : null
+        ).catch((err) => console.error('Failed to save watch progress', err))
       }
     },
-    [activeProfile, movieId]
+    [activeProfile, movieId, isSeries, selectedEpisodeId]
   )
 
   async function handleToggleMyList() {
@@ -75,6 +121,8 @@ export default function MovieDetail() {
     return <div className="min-h-screen bg-black text-white flex items-center justify-center">Loading...</div>
   }
 
+  const videoUrl = isSeries ? selectedEpisode?.video_url : movie.video_url
+
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="px-4 md:px-8 py-4">
@@ -85,9 +133,10 @@ export default function MovieDetail() {
 
       <div className="px-4 md:px-8">
         <div className="aspect-video bg-neutral-900 rounded overflow-hidden mb-6">
-          {movie.video_url ? (
+          {videoUrl ? (
             <ReactPlayer
-              url={movie.video_url}
+              key={selectedEpisodeId || movie.id}
+              url={videoUrl}
               controls
               playing={isPlaying}
               width="100%"
@@ -103,7 +152,7 @@ export default function MovieDetail() {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-neutral-500">
-              No video available for this title yet
+              {isSeries ? 'No video available for this episode yet' : 'No video available for this title yet'}
             </div>
           )}
         </div>
@@ -142,6 +191,68 @@ export default function MovieDetail() {
             {isInMyList ? '✓ In My List' : '+ Add to My List'}
           </button>
         </div>
+
+        {isSeries && movie.seasons?.length > 0 && (
+          <div className="max-w-3xl mt-10 mb-10">
+            <div className="flex items-center gap-4 mb-4">
+              <h2 className="text-xl font-bold">Episodes</h2>
+              {movie.seasons.length > 1 && (
+                <select
+                  value={selectedSeasonId || ''}
+                  onChange={(e) => {
+                    const season = movie.seasons.find((s) => s.id === e.target.value)
+                    handleSelectEpisode(season.id, season.episodes[0]?.id || null)
+                  }}
+                  className="bg-neutral-800 text-white rounded px-3 py-2 outline-none focus:ring-2 focus:ring-red-600"
+                >
+                  {movie.seasons.map((season) => (
+                    <option key={season.id} value={season.id}>
+                      Season {season.season_number}
+                      {season.title ? ` — ${season.title}` : ''}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              {selectedSeason?.episodes.map((episode) => (
+                <div
+                  key={episode.id}
+                  onClick={() => handleSelectEpisode(selectedSeason.id, episode.id)}
+                  className={`flex items-center gap-4 p-3 rounded cursor-pointer transition ${
+                    episode.id === selectedEpisodeId
+                      ? 'bg-neutral-800 ring-1 ring-red-600'
+                      : 'bg-neutral-900 hover:bg-neutral-800'
+                  }`}
+                >
+                  <div className="w-24 h-14 shrink-0 bg-neutral-700 rounded overflow-hidden flex items-center justify-center text-neutral-500 text-xs">
+                    {episode.thumbnail_url ? (
+                      <img
+                        src={episode.thumbnail_url}
+                        alt={episode.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      `E${episode.episode_number}`
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium">
+                      {episode.episode_number}. {episode.title}
+                    </p>
+                    {episode.description && (
+                      <p className="text-neutral-400 text-sm line-clamp-2">{episode.description}</p>
+                    )}
+                  </div>
+                  {episode.duration && (
+                    <span className="text-neutral-500 text-sm shrink-0">{episode.duration} min</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

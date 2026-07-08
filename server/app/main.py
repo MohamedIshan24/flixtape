@@ -5,6 +5,7 @@ from app.routers import auth, profiles
 from app.routers import auth, profiles, genres, cast_members
 from app.routers import auth, profiles, genres, cast_members, movies
 from app.routers import auth, profiles, genres, cast_members, movies, watch_history, my_list
+from app.routers import seasons, episodes
 
 from app.database import engine, Base
 import app.models  # ensures models are registered with Base before create_all
@@ -17,6 +18,8 @@ app.include_router(cast_members.router)
 app.include_router(movies.router)
 app.include_router(watch_history.router)
 app.include_router(my_list.router)
+app.include_router(seasons.router)
+app.include_router(episodes.router)
 
 # Allow the Vite dev server to talk to this API
 app.add_middleware(

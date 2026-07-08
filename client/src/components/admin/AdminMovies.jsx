@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getMovies, createMovie, updateMovie, deleteMovie } from '../../api/movies'
 import { getGenres } from '../../api/genres'
 import { getCastMembers } from '../../api/castMembers'
+import SeasonEpisodeManager from './SeasonEpisodeManager'
 
 const emptyForm = {
   title: '',
@@ -28,6 +29,7 @@ export default function AdminMovies() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [form, setForm] = useState(emptyForm)
+  const [editingMovieSeasons, setEditingMovieSeasons] = useState([])
 
   useEffect(() => {
     load()
@@ -54,6 +56,7 @@ export default function AdminMovies() {
   function openCreateForm() {
     setForm(emptyForm)
     setEditingId(null)
+    setEditingMovieSeasons([])
     setIsFormOpen(true)
   }
 
@@ -74,6 +77,7 @@ export default function AdminMovies() {
       cast_member_ids: movie.cast_members.map((c) => c.id),
     })
     setEditingId(movie.id)
+    setEditingMovieSeasons(movie.seasons || [])
     setIsFormOpen(true)
   }
 
@@ -315,6 +319,14 @@ export default function AdminMovies() {
                 ))}
               </div>
             </div>
+
+            {editingId && form.type === 'series' && (
+              <SeasonEpisodeManager
+                movieId={editingId}
+                seasons={editingMovieSeasons}
+                onSeasonsChange={setEditingMovieSeasons}
+              />
+            )}
 
             <div className="flex gap-3 pt-2">
               <button

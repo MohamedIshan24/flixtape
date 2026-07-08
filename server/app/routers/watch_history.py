@@ -95,3 +95,48 @@ def delete_watch_history_entry(
     db.delete(entry)
     db.commit()
     return None
+
+@router.post("/", response_model=schemas.WatchHistoryOut, status_code=status.HTTP_201_CREATED)
+def upsert_watch_history(
+    profile_id: str,
+    entry_in: schemas.WatchHistoryCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    _get_owned_profile_or_404(profile_id, db, current_user)
+
+    movie = db.query(models.Movie).filter(models.Movie.id == entry_in.movie_id).first()
+    if not movie:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Movie not found")
+
+    query = db.query(models.WatchHistory).filter(
+        models.WatchHistory.profile_id == profile_id,
+        models.WatchHistory.movie_id == entry_in.movie_id,
+    )
+
+    if entry_in.episode_id is not None:
+        episode = db.query(models.Episode).filter(models.Episode.id == entry_in.episode_id).first()
+        if not episode:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Episode not found")
+        query = query.filter(models.WatchHistory.episode_id == entry_in.episode_id)
+    else:
+        query = query.filter(models.WatchHistory.episode_id.is_(None))
+
+    existing = query.first()
+
+    if existing:
+        existing.progress_seconds = entry_in.progress_seconds
+        db.commit()
+        db.refresh(existing)
+        return existing
+
+    new_entry = models.WatchHistory(
+        profile_id=profile_id,
+        movie_id=entry_in.movie_id,
+        episode_id=entry_in.episode_id,
+        progress_seconds=entry_in.progress_seconds,
+    )
+    db.add(new_entry)
+    db.commit()
+    db.refresh(new_entry)
+    return new_entry

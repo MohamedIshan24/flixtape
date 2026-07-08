@@ -138,11 +138,13 @@ class MovieOut(BaseModel):
     type: models.MovieType
     genres: list[GenreOut]
     cast_members: list[CastMemberOut]
+    seasons: list[SeasonOut] = []
 
 # ---------- Watch History ----------
 
 class WatchHistoryCreate(BaseModel):
     movie_id: uuid.UUID
+    episode_id: uuid.UUID | None = None
     progress_seconds: int = 0
 
 
@@ -152,9 +154,11 @@ class WatchHistoryOut(BaseModel):
     id: uuid.UUID
     profile_id: uuid.UUID
     movie_id: uuid.UUID
+    episode_id: uuid.UUID | None
     progress_seconds: int
     watched_at: datetime
     movie: MovieOut
+    episode: EpisodeOut | None = None
 
 
 # ---------- My List ----------
@@ -171,3 +175,58 @@ class MyListOut(BaseModel):
     movie_id: uuid.UUID
     added_at: datetime
     movie: MovieOut
+
+
+# ---------- Episode ----------
+
+class EpisodeCreate(BaseModel):
+    episode_number: int
+    title: str
+    description: str | None = None
+    duration: int | None = None
+    video_url: str | None = None
+    thumbnail_url: str | None = None
+
+
+class EpisodeUpdate(BaseModel):
+    episode_number: int | None = None
+    title: str | None = None
+    description: str | None = None
+    duration: int | None = None
+    video_url: str | None = None
+    thumbnail_url: str | None = None
+
+
+class EpisodeOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    season_id: uuid.UUID
+    episode_number: int
+    title: str
+    description: str | None
+    duration: int | None
+    video_url: str | None
+    thumbnail_url: str | None
+
+
+# ---------- Season ----------
+
+class SeasonCreate(BaseModel):
+    season_number: int
+    title: str | None = None
+
+
+class SeasonUpdate(BaseModel):
+    season_number: int | None = None
+    title: str | None = None
+
+
+class SeasonOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    movie_id: uuid.UUID
+    season_number: int
+    title: str | None
+    episodes: list[EpisodeOut] = []

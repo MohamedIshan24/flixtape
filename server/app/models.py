@@ -99,6 +99,7 @@ class Movie(Base):
     cast_members = relationship("CastMember", secondary=movie_cast, back_populates="movies")
     watch_history = relationship("WatchHistory", back_populates="movie", cascade="all, delete-orphan")
     my_list = relationship("MyList", back_populates="movie", cascade="all, delete-orphan")
+    seasons = relationship("Season", back_populates="movie", order_by="Season.season_number", cascade="all, delete-orphan")
 
 
 class Genre(Base):
@@ -128,9 +129,11 @@ class WatchHistory(Base):
     movie_id = Column(UUID(as_uuid=True), ForeignKey("movies.id"), nullable=False)
     progress_seconds = Column(Integer, default=0)
     watched_at = Column(DateTime, default=datetime.utcnow)
+    episode_id = Column(UUID(as_uuid=True), ForeignKey("episodes.id"), nullable=True)
 
     profile = relationship("Profile", back_populates="watch_history")
     movie = relationship("Movie", back_populates="watch_history")
+    episode = relationship("Episode")
 
 
 class MyList(Base):
@@ -143,3 +146,30 @@ class MyList(Base):
 
     profile = relationship("Profile", back_populates="my_list")
     movie = relationship("Movie", back_populates="my_list")
+
+
+class Season(Base):
+    __tablename__ = "seasons"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    movie_id = Column(UUID(as_uuid=True), ForeignKey("movies.id"), nullable=False)
+    season_number = Column(Integer, nullable=False)
+    title = Column(String, nullable=True)
+
+    movie = relationship("Movie", back_populates="seasons")
+    episodes = relationship("Episode", back_populates="season", order_by="Episode.episode_number", cascade="all, delete-orphan")
+
+
+class Episode(Base):
+    __tablename__ = "episodes"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    season_id = Column(UUID(as_uuid=True), ForeignKey("seasons.id"), nullable=False)
+    episode_number = Column(Integer, nullable=False)
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    duration = Column(Integer, nullable=True)
+    video_url = Column(String, nullable=True)
+    thumbnail_url = Column(String, nullable=True)
+
+    season = relationship("Season", back_populates="episodes")

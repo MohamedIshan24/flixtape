@@ -85,6 +85,7 @@ class Movie(Base):
     release_year = Column(Integer, nullable=True)
     duration = Column(Integer, nullable=True)  # in minutes
     video_url = Column(String, nullable=True)
+    trailer_url = Column(String, nullable=True)
     thumbnail_url = Column(String, nullable=True)
     banner_url = Column(String, nullable=True)
     director = Column(String, nullable=True)

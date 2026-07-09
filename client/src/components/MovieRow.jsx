@@ -1,9 +1,33 @@
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import ReactPlayer from 'react-player'
+
+const HOVER_DELAY_MS = 500
 
 export default function MovieRow({ title, movies, showProgress = false }) {
   const navigate = useNavigate()
+  const [hoveredId, setHoveredId] = useState(null)
+  const [activePreviewId, setActivePreviewId] = useState(null)
+  const hoverTimerRef = useRef(null)
 
   if (!movies || movies.length === 0) return null
+
+  function handleMouseEnter(movieId, trailerUrl) {
+    setHoveredId(movieId)
+    if (!trailerUrl) return
+    hoverTimerRef.current = setTimeout(() => {
+      setActivePreviewId(movieId)
+    }, HOVER_DELAY_MS)
+  }
+
+  function handleMouseLeave() {
+    setHoveredId(null)
+    setActivePreviewId(null)
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current)
+      hoverTimerRef.current = null
+    }
+  }
 
   return (
     <div className="mb-8">
@@ -17,14 +41,33 @@ export default function MovieRow({ title, movies, showProgress = false }) {
               ? Math.min((progressSeconds / (movie.duration * 60)) * 100, 100)
               : null
 
+          const trailerUrl = movie.trailer_url || movie.video_url
+          const isPreviewActive = activePreviewId === movie.id
+
           return (
             <div
               key={movie.id}
               onClick={() => navigate(`/movie/${movie.id}`)}
+              onMouseEnter={() => handleMouseEnter(movie.id, trailerUrl)}
+              onMouseLeave={handleMouseLeave}
               className="shrink-0 w-40 md:w-48 cursor-pointer group"
             >
-              <div className="relative aspect-video bg-neutral-800 rounded overflow-hidden group-hover:ring-2 ring-white transition">
-                {movie.thumbnail_url ? (
+              <div
+                className={`relative aspect-video bg-neutral-800 rounded overflow-hidden transition ${
+                  hoveredId === movie.id ? 'ring-2 ring-white scale-105' : ''
+                }`}
+              >
+                {isPreviewActive ? (
+                  <ReactPlayer
+                    url={trailerUrl}
+                    playing
+                    muted
+                    loop
+                    width="100%"
+                    height="100%"
+                    config={{ youtube: { playerVars: { controls: 0, modestbranding: 1 } } }}
+                  />
+                ) : movie.thumbnail_url ? (
                   <img
                     src={movie.thumbnail_url}
                     alt={movie.title}

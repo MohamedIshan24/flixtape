@@ -10,6 +10,7 @@ const emptyForm = {
   release_year: '',
   duration: '',
   video_url: '',
+  trailer_url: '',
   thumbnail_url: '',
   banner_url: '',
   director: '',
@@ -67,6 +68,7 @@ export default function AdminMovies() {
       release_year: movie.release_year || '',
       duration: movie.duration || '',
       video_url: movie.video_url || '',
+      trailer_url: movie.trailer_url || '',
       thumbnail_url: movie.thumbnail_url || '',
       banner_url: movie.banner_url || '',
       director: movie.director || '',
@@ -109,6 +111,7 @@ export default function AdminMovies() {
       duration: form.duration ? Number(form.duration) : null,
       description: form.description || null,
       video_url: form.video_url || null,
+      trailer_url: form.trailer_url || null,
       thumbnail_url: form.thumbnail_url || null,
       banner_url: form.banner_url || null,
       director: form.director || null,
@@ -243,6 +246,13 @@ export default function AdminMovies() {
                 placeholder="Video URL"
                 value={form.video_url}
                 onChange={(e) => setForm({ ...form, video_url: e.target.value })}
+                className="bg-neutral-800 rounded px-3 py-2 col-span-2 outline-none focus:ring-2 focus:ring-red-600"
+              />
+              <input
+                type="text"
+                placeholder="Trailer URL"
+                value={form.trailer_url}
+                onChange={(e) => setForm({ ...form, trailer_url: e.target.value })}
                 className="bg-neutral-800 rounded px-3 py-2 col-span-2 outline-none focus:ring-2 focus:ring-red-600"
               />
               <input

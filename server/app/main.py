@@ -4,7 +4,7 @@ from app.routers import auth
 from app.routers import auth, profiles
 from app.routers import auth, profiles, genres, cast_members
 from app.routers import auth, profiles, genres, cast_members, movies
-from app.routers import auth, profiles, genres, cast_members, movies, watch_history, my_list
+from app.routers import auth, profiles, genres, cast_members, movies, watch_history, my_list, ratings
 from app.routers import seasons, episodes
 
 from app.database import engine, Base
@@ -20,6 +20,7 @@ app.include_router(watch_history.router)
 app.include_router(my_list.router)
 app.include_router(seasons.router)
 app.include_router(episodes.router)
+app.include_router(ratings.router)
 
 # Allow the Vite dev server to talk to this API
 app.add_middleware(

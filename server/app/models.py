@@ -3,7 +3,7 @@ import enum
 from datetime import datetime
 
 from sqlalchemy import (
-    Column, String, Integer, Boolean, ForeignKey, Enum, Table, DateTime, Text
+    Column, String, Integer, Boolean, ForeignKey, UniqueConstraint, Enum, Table, DateTime, Text, func
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -174,3 +174,20 @@ class Episode(Base):
     thumbnail_url = Column(String, nullable=True)
 
     season = relationship("Season", back_populates="episodes")
+
+class Rating(Base):
+    __tablename__ = "ratings"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    profile_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=False)
+    movie_id = Column(UUID(as_uuid=True), ForeignKey("movies.id"), nullable=False)
+    rating = Column(Integer, nullable=False)  # 1-10
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    profile = relationship("Profile", backref="ratings")
+    movie = relationship("Movie", backref="ratings")
+
+    __table_args__ = (
+        UniqueConstraint("profile_id", "movie_id", name="uq_profile_movie_rating"),
+    )

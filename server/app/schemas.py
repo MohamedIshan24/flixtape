@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, ConfigDict
-
+from pydantic import BaseModel, Field
 from app import models
 from app.models import SubscriptionPlan, UserRole
 
@@ -234,3 +234,23 @@ class MyListOut(BaseModel):
     movie_id: uuid.UUID
     added_at: datetime
     movie: MovieOut
+
+
+# ---------- Rating ----------
+
+
+class RatingBase(BaseModel):
+    rating: int = Field(..., ge=1, le=10)
+
+class RatingCreate(RatingBase):
+    movie_id: uuid.UUID
+
+class RatingOut(RatingBase):
+    id: uuid.UUID
+    profile_id: uuid.UUID
+    movie_id: uuid.UUID
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True

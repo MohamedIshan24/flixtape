@@ -1,11 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth
-from app.routers import auth, profiles
-from app.routers import auth, profiles, genres, cast_members
-from app.routers import auth, profiles, genres, cast_members, movies
-from app.routers import auth, profiles, genres, cast_members, movies, watch_history, my_list, ratings
-from app.routers import seasons, episodes
+from app.routers import auth, profiles, genres, cast_members, movies, watch_history, my_list, seasons, episodes, ratings
 
 from app.database import engine, Base
 import app.models  # ensures models are registered with Base before create_all

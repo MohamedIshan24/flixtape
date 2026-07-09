@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { getMovies } from '../api/movies'
 import { getGenres } from '../api/genres'
 import { getWatchHistory } from '../api/watchHistory'
@@ -15,6 +15,8 @@ export default function Browse() {
   const [genreMovies, setGenreMovies] = useState({})
   const [searchResults, setSearchResults] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
+
+  const debounceRef = useRef(null)
 
   useEffect(() => {
     async function loadHome() {
@@ -48,16 +50,33 @@ export default function Browse() {
     if (activeProfile) loadHome()
   }, [activeProfile])
 
-  const handleSearch = useCallback(async (query) => {
-    if (!query.trim()) {
-      setSearchResults(null)
-      return
-    }
+  const performSearch = useCallback(async (query) => {
     try {
       const res = await getMovies({ search: query })
       setSearchResults(res.data)
     } catch (err) {
       console.error('Search failed', err)
+    }
+  }, [])
+
+  const handleSearch = useCallback((query) => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current)
+    }
+
+    if (!query.trim()) {
+      setSearchResults(null)
+      return
+    }
+
+    debounceRef.current = setTimeout(() => {
+      performSearch(query)
+    }, 400)
+  }, [performSearch])
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
     }
   }, [])
 

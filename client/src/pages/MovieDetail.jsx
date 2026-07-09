@@ -4,7 +4,9 @@ import ReactPlayer from 'react-player'
 import { getMovie } from '../api/movies'
 import { getMyList, addToMyList, removeFromMyList } from '../api/myList'
 import { upsertWatchHistory, getWatchHistory } from '../api/watchHistory'
+import { upsertRating, getRating } from '../api/ratings'
 import { useProfiles } from '../context/ProfileContext'
+import StarRating from '../components/StarRating'
 
 export default function MovieDetail() {
   const { movieId } = useParams()
@@ -18,6 +20,8 @@ export default function MovieDetail() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [selectedSeasonId, setSelectedSeasonId] = useState(null)
   const [selectedEpisodeId, setSelectedEpisodeId] = useState(null)
+  const [myRating, setMyRating] = useState(0)
+  const [isSavingRating, setIsSavingRating] = useState(false)
 
   const lastSavedRef = useRef(0)
 
@@ -45,6 +49,16 @@ export default function MovieDetail() {
         const movieData = movieRes.data
         setMovie(movieData)
         setIsInMyList(listRes.data.some((entry) => entry.movie.id === movieId))
+
+        try {
+          const ratingRes = await getRating(activeProfile.id, movieId)
+          setMyRating(ratingRes.data.rating)
+        } catch (err) {
+          if (err.response?.status !== 404) {
+            console.error('Failed to load rating', err)
+          }
+          setMyRating(0)
+        }
 
         const historyForMovie = historyRes.data.filter((entry) => entry.movie.id === movieId)
 
@@ -117,6 +131,21 @@ export default function MovieDetail() {
     }
   }
 
+  async function handleRate(star) {
+    const previous = myRating
+    setMyRating(star)
+    setIsSavingRating(true)
+    try {
+      const res = await upsertRating(activeProfile.id, movieId, star)
+      setMovie((prev) => ({ ...prev, rating: res.data.rating ?? prev.rating }))
+    } catch (err) {
+      console.error('Failed to save rating', err)
+      setMyRating(previous)
+    } finally {
+      setIsSavingRating(false)
+    }
+  }
+
   if (isLoading || !movie) {
     return <div className="min-h-screen bg-black text-white flex items-center justify-center">Loading...</div>
   }
@@ -162,7 +191,12 @@ export default function MovieDetail() {
           <div className="flex items-center gap-3 text-neutral-400 text-sm mb-4">
             {movie.release_year && <span>{movie.release_year}</span>}
             {movie.duration && <span>{movie.duration} min</span>}
-            {movie.rating > 0 && <span>★ {movie.rating.toFixed(1)}</span>}
+            {movie.rating > 0 && (
+              <span>
+                ★ {movie.rating.toFixed(1)}
+                {movie.rating_count > 0 && ` (${movie.rating_count} rating${movie.rating_count === 1 ? '' : 's'})`}
+              </span>
+            )}
           </div>
           <p className="text-neutral-200 mb-6">{movie.description}</p>
 
@@ -180,16 +214,25 @@ export default function MovieDetail() {
             </p>
           )}
 
-          <button
-            onClick={handleToggleMyList}
-            className={`px-6 py-3 rounded font-semibold transition ${
-              isInMyList
-                ? 'bg-neutral-700 text-white hover:bg-neutral-600'
-                : 'bg-white text-black hover:bg-neutral-200'
-            }`}
-          >
-            {isInMyList ? '✓ In My List' : '+ Add to My List'}
-          </button>
+          <div className="flex flex-wrap items-center gap-6 mb-6">
+            <button
+              onClick={handleToggleMyList}
+              className={`px-6 py-3 rounded font-semibold transition ${
+                isInMyList
+                  ? 'bg-neutral-700 text-white hover:bg-neutral-600'
+                  : 'bg-white text-black hover:bg-neutral-200'
+              }`}
+            >
+              {isInMyList ? '✓ In My List' : '+ Add to My List'}
+            </button>
+
+            <div>
+              <p className="text-neutral-500 text-xs mb-1">
+                {myRating > 0 ? 'Your rating' : 'Rate this'}
+              </p>
+              <StarRating value={myRating} onChange={handleRate} size="text-xl" />
+            </div>
+          </div>
         </div>
 
         {isSeries && movie.seasons?.length > 0 && (

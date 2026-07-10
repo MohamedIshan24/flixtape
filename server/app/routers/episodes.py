@@ -21,6 +21,19 @@ def create_episode(
 
     new_episode = models.Episode(season_id=season_id, **episode_in.model_dump())
     db.add(new_episode)
+    db.flush()  # get new_episode.id without committing yet
+
+    movie = season.movie
+    my_list_entries = db.query(models.MyList).filter(models.MyList.movie_id == movie.id).all()
+    for entry in my_list_entries:
+        notification = models.Notification(
+            profile_id=entry.profile_id,
+            movie_id=movie.id,
+            episode_id=new_episode.id,
+            message=f"New episode added to {movie.title}: {new_episode.title}",
+        )
+        db.add(notification)
+
     db.commit()
     db.refresh(new_episode)
     return new_episode

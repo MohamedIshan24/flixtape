@@ -77,7 +77,8 @@ class Profile(Base):
     watch_history = relationship("WatchHistory", back_populates="profile", cascade="all, delete-orphan")
     my_list = relationship("MyList", back_populates="profile", cascade="all, delete-orphan")
     ratings = relationship("Rating", back_populates="profile", cascade="all, delete-orphan")
-
+    notifications = relationship("Notification", back_populates="profile", cascade="all, delete-orphan")
+    
 class Movie(Base):
     __tablename__ = "movies"
 
@@ -192,3 +193,19 @@ class Rating(Base):
     __table_args__ = (
         UniqueConstraint("profile_id", "movie_id", name="uq_profile_movie_rating"),
     )
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    profile_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=False)
+    movie_id = Column(UUID(as_uuid=True), ForeignKey("movies.id"), nullable=False)
+    episode_id = Column(UUID(as_uuid=True), ForeignKey("episodes.id"), nullable=True)
+    message = Column(String, nullable=False)
+    is_read = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    profile = relationship("Profile", back_populates="notifications")
+    movie = relationship("Movie")
+    episode = relationship("Episode")

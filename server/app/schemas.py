@@ -298,3 +298,18 @@ class AnalyticsOut(BaseModel):
     most_rated: list[MovieStatOut]
     signups_over_time: list[SignupPoint]
     active_subscriptions_by_plan: list[PlanBreakdown]
+
+
+# ---------- Notification ----------
+
+class NotificationOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    profile_id: uuid.UUID
+    movie_id: uuid.UUID
+    episode_id: uuid.UUID | None
+    message: str
+    is_read: bool
+    created_at: datetime
+    movie: MovieOut

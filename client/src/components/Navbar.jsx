@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useProfiles } from '../context/ProfileContext'
 import { useAuth } from '../context/AuthContext'
+import NotificationBell from './NotificationBell'
 
 export default function Navbar({ onSearch }) {
   const { activeProfile, clearActiveProfile } = useProfiles()
@@ -47,6 +48,7 @@ export default function Navbar({ onSearch }) {
           onChange={handleSearchChange}
           className="bg-black/70 border border-neutral-600 text-white text-sm rounded px-3 py-2 w-40 md:w-64 outline-none focus:border-white transition"
         />
+        <NotificationBell />
         {user?.role === 'admin' && (
           <span className="text-[10px] uppercase tracking-wide bg-red-600 text-white px-2 py-0.5 rounded font-semibold">
             Admin

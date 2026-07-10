@@ -16,7 +16,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="flex items-center justify-between px-4 md:px-8 py-4 border-b border-neutral-800">
-        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+        <h1 className="text-2xl font-bold">Manage Content</h1>
         <Link to="/browse" className="text-neutral-400 hover:text-white text-sm">
           ← Back to Browse
         </Link>

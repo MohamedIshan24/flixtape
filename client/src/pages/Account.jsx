@@ -80,10 +80,9 @@ export default function Account() {
         ← Back
       </button>
 
-      <h1 className="text-3xl font-bold mb-8">Account</h1>
+    <h1 className="text-3xl font-bold mb-8">Settings</h1>
 
-      <div className="max-w-lg space-y-8">
-        {/* Profile / plan info */}
+    <div className="max-w-lg mx-auto space-y-8">        {/* Profile / plan info */}
         <div className="bg-neutral-900 rounded-lg p-6 space-y-4">
           <div>
             <p className="text-neutral-500 text-sm">Email</p>

@@ -47,12 +47,20 @@ export default function Navbar({ onSearch }) {
           onChange={handleSearchChange}
           className="bg-black/70 border border-neutral-600 text-white text-sm rounded px-3 py-2 w-40 md:w-64 outline-none focus:border-white transition"
         />
-        <div
-          onClick={handleSwitchProfile}
-          className="w-8 h-8 rounded bg-neutral-700 flex items-center justify-center text-white text-sm cursor-pointer hover:ring-2 ring-white"
-          title={`Switch profile (currently ${activeProfile?.name})`}
-        >
-          {activeProfile?.name?.charAt(0).toUpperCase()}
+        {user?.role === 'admin' && (
+          <span className="text-[10px] uppercase tracking-wide bg-red-600 text-white px-2 py-0.5 rounded font-semibold">
+            Admin
+          </span>
+        )}
+        <div className="flex flex-col items-center gap-1">
+          <div
+            onClick={handleSwitchProfile}
+            className="w-8 h-8 rounded bg-neutral-700 flex items-center justify-center text-white text-sm cursor-pointer hover:ring-2 ring-white"
+            title={`Switch profile (currently ${activeProfile?.name})`}
+          >
+            {activeProfile?.name?.charAt(0).toUpperCase()}
+          </div>
+          <span className="text-neutral-400 text-[10px]">{activeProfile?.name}</span>
         </div>
       </div>
     </div>

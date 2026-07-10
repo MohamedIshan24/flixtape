@@ -76,7 +76,7 @@ class Profile(Base):
     user = relationship("User", back_populates="profiles")
     watch_history = relationship("WatchHistory", back_populates="profile", cascade="all, delete-orphan")
     my_list = relationship("MyList", back_populates="profile", cascade="all, delete-orphan")
-
+    ratings = relationship("Rating", back_populates="profile", cascade="all, delete-orphan")
 
 class Movie(Base):
     __tablename__ = "movies"
@@ -187,9 +187,8 @@ class Rating(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
-    profile = relationship("Profile", backref="ratings")
+    profile = relationship("Profile", back_populates="ratings")
     movie = relationship("Movie", backref="ratings")
-
     __table_args__ = (
         UniqueConstraint("profile_id", "movie_id", name="uq_profile_movie_rating"),
     )

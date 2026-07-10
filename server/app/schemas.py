@@ -268,3 +268,8 @@ class CheckoutSessionOut(BaseModel):
 
 class PortalSessionOut(BaseModel):
     portal_url: str
+
+
+class PasswordChange(BaseModel):
+    current_password: str
+    new_password: str

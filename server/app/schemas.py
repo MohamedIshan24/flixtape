@@ -23,9 +23,9 @@ class UserOut(BaseModel):
     id: uuid.UUID
     email: EmailStr
     subscription_plan: SubscriptionPlan
+    subscription_status: str | None = None
     role: UserRole
     created_at: datetime
-
 
 # ---------- Auth tokens ----------
 
@@ -254,3 +254,17 @@ class RatingOut(RatingBase):
 
     class Config:
         from_attributes = True
+
+
+# ---------- Billing ----------
+
+class CheckoutSessionCreate(BaseModel):
+    plan: str  # "basic", "standard", or "premium"
+
+
+class CheckoutSessionOut(BaseModel):
+    checkout_url: str
+
+
+class PortalSessionOut(BaseModel):
+    portal_url: str

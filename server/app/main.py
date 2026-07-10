@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth, profiles, genres, cast_members, movies, watch_history, my_list, seasons, episodes, ratings
+from app.routers import (auth, profiles, genres, cast_members, movies, watch_history, my_list, seasons, episodes, ratings, billing)
 
 from app.database import engine, Base
 import app.models  # ensures models are registered with Base before create_all
@@ -16,6 +16,7 @@ app.include_router(my_list.router)
 app.include_router(seasons.router)
 app.include_router(episodes.router)
 app.include_router(ratings.router)
+app.include_router(billing.router)
 
 # Allow the Vite dev server to talk to this API
 app.add_middleware(

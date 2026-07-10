@@ -29,6 +29,9 @@ export default function Navbar({ onSearch }) {
         <Link to="/my-list" className="text-neutral-300 hover:text-white text-sm">
           My List
         </Link>
+        <Link to="/account" className="text-neutral-300 hover:text-white text-sm">
+          Account
+        </Link>
         {user?.role === 'admin' && (
           <Link to="/admin" className="text-neutral-300 hover:text-white text-sm">
             Admin

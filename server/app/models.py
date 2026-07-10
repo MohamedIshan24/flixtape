@@ -56,11 +56,13 @@ class User(Base):
     email = Column(String, unique=True, nullable=False, index=True)
     hashed_password = Column(String, nullable=False)
     subscription_plan = Column(Enum(SubscriptionPlan), default=SubscriptionPlan.free, nullable=False)
+    stripe_customer_id = Column(String, nullable=True, unique=True)
+    stripe_subscription_id = Column(String, nullable=True, unique=True)
+    subscription_status = Column(String, nullable=True)  # active, canceled, past_due, incomplete, etc.
     role = Column(Enum(UserRole), default=UserRole.user, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     profiles = relationship("Profile", back_populates="user", cascade="all, delete-orphan")
-
 
 class Profile(Base):
     __tablename__ = "profiles"

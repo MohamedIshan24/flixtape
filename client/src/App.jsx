@@ -6,6 +6,8 @@ import Browse from './pages/Browse'
 import MovieDetail from './pages/MovieDetail'
 import MyList from './pages/MyList'
 import AdminDashboard from './pages/AdminDashboard'
+import Pricing from './pages/Pricing'
+import Account from './pages/Account'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
 
@@ -44,6 +46,22 @@ function App() {
           element={
             <ProtectedRoute>
               <MyList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pricing"
+          element={
+            <ProtectedRoute>
+              <Pricing />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/account"
+          element={
+            <ProtectedRoute>
+              <Account />
             </ProtectedRoute>
           }
         />

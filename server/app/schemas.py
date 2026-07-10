@@ -273,3 +273,28 @@ class PortalSessionOut(BaseModel):
 class PasswordChange(BaseModel):
     current_password: str
     new_password: str
+
+
+# ---------- Analytics ----------
+
+class MovieStatOut(BaseModel):
+    id: uuid.UUID
+    title: str
+    value: int
+
+
+class SignupPoint(BaseModel):
+    month: str  # e.g. "2026-01"
+    count: int
+
+
+class PlanBreakdown(BaseModel):
+    plan: str
+    count: int
+
+
+class AnalyticsOut(BaseModel):
+    most_watched: list[MovieStatOut]
+    most_rated: list[MovieStatOut]
+    signups_over_time: list[SignupPoint]
+    active_subscriptions_by_plan: list[PlanBreakdown]

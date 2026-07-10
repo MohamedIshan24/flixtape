@@ -2,12 +2,14 @@ import { useState } from 'react'
 import AdminMovies from '../components/admin/AdminMovies'
 import AdminGenres from '../components/admin/AdminGenres'
 import AdminCastMembers from '../components/admin/AdminCastMembers'
+import AdminAnalytics from '../components/admin/AdminAnalytics'
 import { Link } from 'react-router-dom'
 
 const TABS = [
   { key: 'movies', label: 'Movies' },
   { key: 'genres', label: 'Genres' },
   { key: 'cast', label: 'Cast Members' },
+  { key: 'analytics', label: 'Analytics' },
 ]
 
 export default function AdminDashboard() {
@@ -42,6 +44,7 @@ export default function AdminDashboard() {
         {activeTab === 'movies' && <AdminMovies />}
         {activeTab === 'genres' && <AdminGenres />}
         {activeTab === 'cast' && <AdminCastMembers />}
+        {activeTab === 'analytics' && <AdminAnalytics />}
       </div>
     </div>
   )

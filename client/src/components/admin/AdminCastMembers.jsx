@@ -74,6 +74,13 @@ export default function AdminCastMembers() {
 
       {isLoading ? (
         <p className="text-neutral-400">Loading...</p>
+      ) : castMembers.length === 0 ? (
+        <div className="flex flex-col items-center justify-center text-center py-16 border border-dashed border-neutral-700 rounded">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-10 h-10 text-neutral-600 mb-3">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+          </svg>
+          <p className="text-neutral-400 text-sm">No cast members yet. Add your first one above.</p>
+        </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {castMembers.map((cast) => (

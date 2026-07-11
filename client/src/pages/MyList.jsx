@@ -52,7 +52,21 @@ export default function MyList() {
             ))}
           </div>
         ) : list.length === 0 ? (
-          <p className="text-neutral-400">Your list is empty. Add titles from the browse page.</p>
+          <div className="flex flex-col items-center justify-center text-center py-24">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-16 h-16 text-neutral-600 mb-4">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            <h2 className="text-white text-lg font-semibold mb-2">Your list is empty</h2>
+            <p className="text-neutral-400 text-sm mb-6 max-w-sm">
+              Save movies and shows you want to watch later by tapping "Add to My List" on any title.
+            </p>
+            <button
+              onClick={() => navigate('/browse')}
+              className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded font-semibold"
+            >
+              Browse Titles
+            </button>
+          </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {list.map((entry) => (

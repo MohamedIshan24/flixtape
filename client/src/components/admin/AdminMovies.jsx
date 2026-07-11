@@ -154,6 +154,13 @@ export default function AdminMovies() {
 
       {isLoading ? (
         <p className="text-neutral-400">Loading...</p>
+      ) : movies.length === 0 ? (
+        <div className="flex flex-col items-center justify-center text-center py-16 border border-dashed border-neutral-700 rounded">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-10 h-10 text-neutral-600 mb-3">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Z" />
+          </svg>
+          <p className="text-neutral-400 text-sm">No movies yet. Click "Add Movie" above to create your first one.</p>
+        </div>
       ) : (
         <div className="space-y-2">
           {movies.map((movie) => (

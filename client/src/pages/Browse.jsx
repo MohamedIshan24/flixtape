@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { getMovies, getRecommendations } from '../api/movies'
 import { getGenres } from '../api/genres'
 import { getWatchHistory } from '../api/watchHistory'
@@ -10,6 +11,7 @@ import MovieRowSkeleton from '../components/skeletons/MovieRowSkeleton'
 
 export default function Browse() {
   const { activeProfile } = useProfiles()
+  const navigate = useNavigate()
   const [continueWatching, setContinueWatching] = useState([])
   const [recommendations, setRecommendations] = useState([])
   const [trending, setTrending] = useState([])
@@ -18,6 +20,7 @@ export default function Browse() {
   const [genres, setGenres] = useState([])
   const [genreMovies, setGenreMovies] = useState({})
   const [searchResults, setSearchResults] = useState(null)
+  const [lastQuery, setLastQuery] = useState('')
   const [isLoading, setIsLoading] = useState(true)
 
   const debounceRef = useRef(null)
@@ -66,6 +69,7 @@ export default function Browse() {
       const kidsFilter = isKids ? { kids_friendly: true } : {}
       const res = await getMovies({ search: query, ...kidsFilter })
       setSearchResults(res.data)
+      setLastQuery(query)
     } catch (err) {
       console.error('Search failed', err)
     }
@@ -115,9 +119,20 @@ export default function Browse() {
 
       {searchResults !== null ? (
         <div className="pt-4">
-          <MovieRow title={`Search results (${searchResults.length})`} movies={searchResults} />
-          {searchResults.length === 0 && (
-            <p className="text-neutral-400 px-4 md:px-8">No titles found.</p>
+          {searchResults.length === 0 ? (
+            <div className="flex flex-col items-center justify-center text-center py-24 px-4">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-16 h-16 text-neutral-600 mb-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+              </svg>
+              <h2 className="text-white text-lg font-semibold mb-2">
+                No results for "{lastQuery}"
+              </h2>
+              <p className="text-neutral-400 text-sm max-w-sm">
+                Try a different title, or check your spelling.
+              </p>
+            </div>
+          ) : (
+            <MovieRow title={`Search results (${searchResults.length})`} movies={searchResults} />
           )}
         </div>
       ) : (

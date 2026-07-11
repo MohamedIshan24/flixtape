@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from app.database import get_db
 from app import models, schemas
-from app.dependencies import get_current_admin_user
+from app.dependencies import get_current_admin_user, get_current_user
 
 router = APIRouter(prefix="/movies", tags=["movies"])
 
@@ -20,6 +21,15 @@ def _attach_genres_and_cast(movie: models.Movie, db: Session, genre_ids, cast_me
         if len(cast_members) != len(cast_member_ids):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="One or more cast_member_ids not found")
         movie.cast_members = cast_members
+
+
+def _check_profile_ownership(profile_id: str, current_user: models.User, db: Session):
+    profile = db.query(models.Profile).filter(models.Profile.id == profile_id).first()
+    if not profile:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+    if profile.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your profile")
+    return profile
 
 
 @router.post("/", response_model=schemas.MovieOut, status_code=status.HTTP_201_CREATED)
@@ -58,6 +68,61 @@ def list_movies(
     if search is not None:
         query = query.filter(models.Movie.title.ilike(f"%{search}%"))
     return query.all()
+
+
+@router.get("/recommendations/{profile_id}", response_model=list[schemas.MovieOut])
+def get_recommendations(
+    profile_id: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    _check_profile_ownership(profile_id, current_user, db)
+
+    watched_movie_ids = (
+        db.query(models.WatchHistory.movie_id)
+        .filter(models.WatchHistory.profile_id == profile_id)
+        .distinct()
+        .all()
+    )
+    watched_ids = [row[0] for row in watched_movie_ids]
+
+    if not watched_ids:
+        return (
+            db.query(models.Movie)
+            .filter(models.Movie.is_trending == True)
+            .limit(10)
+            .all()
+        )
+
+    watched_genre_ids = (
+        db.query(models.Genre.id)
+        .join(models.movie_genres, models.movie_genres.c.genre_id == models.Genre.id)
+        .filter(models.movie_genres.c.movie_id.in_(watched_ids))
+        .distinct()
+        .all()
+    )
+    genre_ids = [row[0] for row in watched_genre_ids]
+
+    if not genre_ids:
+        return (
+            db.query(models.Movie)
+            .filter(models.Movie.is_trending == True)
+            .limit(10)
+            .all()
+        )
+
+    recommendations = (
+        db.query(models.Movie, func.count(models.movie_genres.c.genre_id).label("overlap"))
+        .join(models.movie_genres, models.movie_genres.c.movie_id == models.Movie.id)
+        .filter(models.movie_genres.c.genre_id.in_(genre_ids))
+        .filter(~models.Movie.id.in_(watched_ids))
+        .group_by(models.Movie.id)
+        .order_by(func.count(models.movie_genres.c.genre_id).desc())
+        .limit(10)
+        .all()
+    )
+
+    return [movie for movie, overlap in recommendations]
 
 
 @router.get("/{movie_id}", response_model=schemas.MovieOut)

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { getMovies } from '../api/movies'
+import { getMovies, getRecommendations } from '../api/movies'
 import { getGenres } from '../api/genres'
 import { getWatchHistory } from '../api/watchHistory'
 import { useProfiles } from '../context/ProfileContext'
@@ -9,6 +9,7 @@ import MovieRow from '../components/MovieRow'
 export default function Browse() {
   const { activeProfile } = useProfiles()
   const [continueWatching, setContinueWatching] = useState([])
+  const [recommendations, setRecommendations] = useState([])
   const [trending, setTrending] = useState([])
   const [featured, setFeatured] = useState([])
   const [genres, setGenres] = useState([])
@@ -22,13 +23,15 @@ export default function Browse() {
     async function loadHome() {
       setIsLoading(true)
       try {
-        const [historyRes, trendingRes, featuredRes, genresRes] = await Promise.all([
+        const [historyRes, recommendationsRes, trendingRes, featuredRes, genresRes] = await Promise.all([
           getWatchHistory(activeProfile.id),
+          getRecommendations(activeProfile.id),
           getMovies({ trending: true }),
           getMovies({ featured: true }),
           getGenres(),
         ])
         setContinueWatching(historyRes.data)
+        setRecommendations(recommendationsRes.data)
         setTrending(trendingRes.data)
         setFeatured(featuredRes.data)
         setGenres(genresRes.data)
@@ -119,6 +122,7 @@ export default function Browse() {
           )}
 
           <MovieRow title="Continue Watching" movies={continueWatching} showProgress />
+          <MovieRow title="Recommended for You" movies={recommendations} />
           <MovieRow title="Trending Now" movies={trending} />
           <MovieRow title="Featured" movies={featured} />
           {genres.map((genre) => (

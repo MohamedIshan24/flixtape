@@ -43,7 +43,14 @@ export default function MyList() {
         <h1 className="text-white text-2xl font-bold mb-6">My List</h1>
 
         {isLoading ? (
-          <p className="text-neutral-400">Loading...</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div key={i}>
+                <div className="aspect-video bg-neutral-800 rounded animate-pulse" />
+                <div className="h-4 w-3/4 bg-neutral-800 rounded mt-2 animate-pulse" />
+              </div>
+            ))}
+          </div>
         ) : list.length === 0 ? (
           <p className="text-neutral-400">Your list is empty. Add titles from the browse page.</p>
         ) : (

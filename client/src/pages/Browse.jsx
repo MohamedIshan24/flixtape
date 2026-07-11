@@ -5,6 +5,8 @@ import { getWatchHistory } from '../api/watchHistory'
 import { useProfiles } from '../context/ProfileContext'
 import Navbar from '../components/Navbar'
 import MovieRow from '../components/MovieRow'
+import HeroSkeleton from '../components/skeletons/HeroSkeleton'
+import MovieRowSkeleton from '../components/skeletons/MovieRowSkeleton'
 
 export default function Browse() {
   const { activeProfile } = useProfiles()
@@ -18,16 +20,19 @@ export default function Browse() {
   const [isLoading, setIsLoading] = useState(true)
 
   const debounceRef = useRef(null)
+  const isKids = !!activeProfile?.is_kids
 
   useEffect(() => {
     async function loadHome() {
       setIsLoading(true)
       try {
+        const kidsFilter = isKids ? { kids_friendly: true } : {}
+
         const [historyRes, recommendationsRes, trendingRes, featuredRes, genresRes] = await Promise.all([
           getWatchHistory(activeProfile.id),
           getRecommendations(activeProfile.id),
-          getMovies({ trending: true }),
-          getMovies({ featured: true }),
+          getMovies({ trending: true, ...kidsFilter }),
+          getMovies({ featured: true, ...kidsFilter }),
           getGenres(),
         ])
         setContinueWatching(historyRes.data)
@@ -37,7 +42,7 @@ export default function Browse() {
         setGenres(genresRes.data)
 
         const genreResults = await Promise.all(
-          genresRes.data.map((genre) => getMovies({ genre_id: genre.id }))
+          genresRes.data.map((genre) => getMovies({ genre_id: genre.id, ...kidsFilter }))
         )
         const genreMap = {}
         genresRes.data.forEach((genre, i) => {
@@ -51,16 +56,17 @@ export default function Browse() {
       }
     }
     if (activeProfile) loadHome()
-  }, [activeProfile])
+  }, [activeProfile, isKids])
 
   const performSearch = useCallback(async (query) => {
     try {
-      const res = await getMovies({ search: query })
+      const kidsFilter = isKids ? { kids_friendly: true } : {}
+      const res = await getMovies({ search: query, ...kidsFilter })
       setSearchResults(res.data)
     } catch (err) {
       console.error('Search failed', err)
     }
-  }, [])
+  }, [isKids])
 
   const handleSearch = useCallback((query) => {
     if (debounceRef.current) {
@@ -86,8 +92,19 @@ export default function Browse() {
   const heroMovie = featured[0]
 
   if (isLoading) {
-    return <div className="min-h-screen bg-black text-white flex items-center justify-center">Loading...</div>
+    return (
+      <div className="min-h-screen bg-black">
+        <Navbar onSearch={() => {}} />
+        <HeroSkeleton />
+        <MovieRowSkeleton />
+        <MovieRowSkeleton />
+        <MovieRowSkeleton />
+        <MovieRowSkeleton />
+      </div>
+    )
   }
+
+  const visibleGenres = genres.filter((genre) => (genreMovies[genre.id]?.length ?? 0) > 0)
 
   return (
     <div className="min-h-screen bg-black">
@@ -125,7 +142,7 @@ export default function Browse() {
           <MovieRow title="Recommended for You" movies={recommendations} />
           <MovieRow title="Trending Now" movies={trending} />
           <MovieRow title="Featured" movies={featured} />
-          {genres.map((genre) => (
+          {visibleGenres.map((genre) => (
             <MovieRow key={genre.id} title={genre.name} movies={genreMovies[genre.id]} />
           ))}
         </>

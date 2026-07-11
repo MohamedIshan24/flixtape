@@ -8,6 +8,8 @@ from app.dependencies import get_current_admin_user, get_current_user
 
 router = APIRouter(prefix="/movies", tags=["movies"])
 
+KIDS_GENRE_NAME = "Kids & Family"
+
 
 def _attach_genres_and_cast(movie: models.Movie, db: Session, genre_ids, cast_member_ids):
     if genre_ids is not None:
@@ -57,6 +59,7 @@ def list_movies(
     featured: bool | None = None,
     genre_id: str | None = None,
     search: str | None = None,
+    kids_friendly: bool | None = None,
 ):
     query = db.query(models.Movie)
     if trending is not None:
@@ -67,6 +70,8 @@ def list_movies(
         query = query.filter(models.Movie.genres.any(models.Genre.id == genre_id))
     if search is not None:
         query = query.filter(models.Movie.title.ilike(f"%{search}%"))
+    if kids_friendly:
+        query = query.filter(models.Movie.genres.any(models.Genre.name == KIDS_GENRE_NAME))
     return query.all()
 
 
@@ -76,7 +81,7 @@ def get_recommendations(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    _check_profile_ownership(profile_id, current_user, db)
+    profile = _check_profile_ownership(profile_id, current_user, db)
 
     watched_movie_ids = (
         db.query(models.WatchHistory.movie_id)
@@ -86,13 +91,12 @@ def get_recommendations(
     )
     watched_ids = [row[0] for row in watched_movie_ids]
 
+    base_query = db.query(models.Movie)
+    if profile.is_kids:
+        base_query = base_query.filter(models.Movie.genres.any(models.Genre.name == KIDS_GENRE_NAME))
+
     if not watched_ids:
-        return (
-            db.query(models.Movie)
-            .filter(models.Movie.is_trending == True)
-            .limit(10)
-            .all()
-        )
+        return base_query.filter(models.Movie.is_trending == True).limit(10).all()
 
     watched_genre_ids = (
         db.query(models.Genre.id)
@@ -104,25 +108,19 @@ def get_recommendations(
     genre_ids = [row[0] for row in watched_genre_ids]
 
     if not genre_ids:
-        return (
-            db.query(models.Movie)
-            .filter(models.Movie.is_trending == True)
-            .limit(10)
-            .all()
-        )
+        return base_query.filter(models.Movie.is_trending == True).limit(10).all()
 
-    recommendations = (
-        db.query(models.Movie, func.count(models.movie_genres.c.genre_id).label("overlap"))
+    recommendations_query = (
+        base_query
         .join(models.movie_genres, models.movie_genres.c.movie_id == models.Movie.id)
         .filter(models.movie_genres.c.genre_id.in_(genre_ids))
         .filter(~models.Movie.id.in_(watched_ids))
         .group_by(models.Movie.id)
         .order_by(func.count(models.movie_genres.c.genre_id).desc())
         .limit(10)
-        .all()
     )
 
-    return [movie for movie, overlap in recommendations]
+    return recommendations_query.all()
 
 
 @router.get("/{movie_id}", response_model=schemas.MovieOut)

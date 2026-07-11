@@ -79,7 +79,7 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid webhook signature")
 
     event_type = event["type"]
-    data = event["data"]["object"]
+    data = event["data"]["object"].to_dict()
 
     if event_type == "checkout.session.completed":
         user_id = data.get("metadata", {}).get("user_id")

@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app import models, schemas
 from app.dependencies import get_current_user
+from app.email_utils import send_payment_receipt_email, send_payment_failed_email
 
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
@@ -94,6 +95,11 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
                     user.subscription_plan = models.SubscriptionPlan(plan)
                 db.commit()
 
+                amount_total = data.get("amount_total")
+                currency = data.get("currency", "usd").upper()
+                amount_str = f"{amount_total / 100:.2f} {currency}" if amount_total else "N/A"
+                send_payment_receipt_email(user.email, plan or user.subscription_plan.value, amount_str)
+
     elif event_type in ("customer.subscription.updated", "customer.subscription.deleted"):
         customer_id = data.get("customer")
         status_value = data.get("status")
@@ -104,5 +110,11 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
                 user.subscription_plan = models.SubscriptionPlan.free
                 user.stripe_subscription_id = None
             db.commit()
+
+    elif event_type == "invoice.payment_failed":
+        customer_id = data.get("customer")
+        user = db.query(models.User).filter(models.User.stripe_customer_id == customer_id).first()
+        if user:
+            send_payment_failed_email(user.email)
 
     return {"status": "success"}

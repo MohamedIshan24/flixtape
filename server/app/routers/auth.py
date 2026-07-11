@@ -5,6 +5,7 @@ from app.database import get_db
 from app import models, schemas
 from app.auth_utils import hash_password, verify_password, create_access_token
 from app.dependencies import get_current_user
+from app.email_utils import send_welcome_email
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -22,6 +23,9 @@ def signup(user_in: schemas.UserCreate, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+
+    send_welcome_email(new_user.email)
+
     return new_user
 
 

@@ -26,6 +26,14 @@ def list_cast_members(db: Session = Depends(get_db)):
     return db.query(models.CastMember).all()
 
 
+@router.get("/{cast_id}", response_model=schemas.CastMemberDetailOut)
+def get_cast_member(cast_id: str, db: Session = Depends(get_db)):
+    cast = db.query(models.CastMember).filter(models.CastMember.id == cast_id).first()
+    if not cast:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cast member not found")
+    return cast
+
+
 @router.delete("/{cast_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_cast_member(
     cast_id: str,

@@ -151,6 +151,7 @@ export default function MovieDetail() {
   }
 
   const videoUrl = isSeries ? selectedEpisode?.video_url : movie.video_url
+  const posterUrl = movie.thumbnail_url || movie.banner_url
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -161,7 +162,7 @@ export default function MovieDetail() {
       </div>
 
       <div className="px-4 md:px-8">
-        <div className="aspect-video bg-neutral-900 rounded overflow-hidden mb-6">
+        <div className="aspect-video bg-neutral-900 rounded overflow-hidden mb-6 relative">
           {videoUrl ? (
             <ReactPlayer
               key={selectedEpisodeId || movie.id}
@@ -179,6 +180,13 @@ export default function MovieDetail() {
                 },
               }}
             />
+          ) : posterUrl ? (
+            <div className="w-full h-full relative">
+              <img src={posterUrl} alt={movie.title} className="w-full h-full object-cover opacity-40" />
+              <div className="absolute inset-0 flex items-center justify-center text-neutral-300 text-sm bg-black/30">
+                {isSeries ? 'No video available for this episode yet' : 'No video available for this title yet'}
+              </div>
+            </div>
           ) : (
             <div className="w-full h-full flex items-center justify-center text-neutral-500">
               {isSeries ? 'No video available for this episode yet' : 'No video available for this title yet'}
@@ -186,51 +194,69 @@ export default function MovieDetail() {
           )}
         </div>
 
-        <div className="max-w-3xl">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">{movie.title}</h1>
-          <div className="flex items-center gap-3 text-neutral-400 text-sm mb-4">
-            {movie.release_year && <span>{movie.release_year}</span>}
-            {movie.duration && <span>{movie.duration} min</span>}
-            {movie.rating > 0 && (
-              <span>
-                ★ {movie.rating.toFixed(1)}
-                {movie.rating_count > 0 && ` (${movie.rating_count} rating${movie.rating_count === 1 ? '' : 's'})`}
-              </span>
-            )}
-          </div>
-          <p className="text-neutral-200 mb-6">{movie.description}</p>
-
-          {movie.director && (
-            <p className="text-neutral-400 text-sm mb-2">
-              <span className="text-neutral-500">Director: </span>
-              {movie.director}
-            </p>
+        <div className="max-w-5xl flex flex-col md:flex-row items-start gap-8 mb-6">
+          {posterUrl && (
+            <div className="w-40 md:w-48 shrink-0">
+              <img src={posterUrl} alt={movie.title} className="w-full rounded shadow-lg" />
+            </div>
           )}
 
-          {movie.cast_members?.length > 0 && (
-            <p className="text-neutral-400 text-sm mb-6">
-              <span className="text-neutral-500">Cast: </span>
-              {movie.cast_members.map((c) => c.name).join(', ')}
-            </p>
-          )}
+          <div className="flex-1 max-w-3xl">
+            <h1 className="text-3xl md:text-4xl font-bold mb-2">{movie.title}</h1>
+            <div className="flex items-center gap-3 text-neutral-400 text-sm mb-4">
+              {movie.release_year && <span>{movie.release_year}</span>}
+              {movie.duration && <span>{movie.duration} min</span>}
+              {movie.rating > 0 && (
+                <span>
+                  ★ {movie.rating.toFixed(1)}
+                  {movie.rating_count > 0 && ` (${movie.rating_count} rating${movie.rating_count === 1 ? '' : 's'})`}
+                </span>
+              )}
+            </div>
+            <p className="text-neutral-200 mb-6">{movie.description}</p>
 
-          <div className="flex flex-wrap items-center gap-6 mb-6">
-            <button
-              onClick={handleToggleMyList}
-              className={`px-6 py-3 rounded font-semibold transition ${
-                isInMyList
-                  ? 'bg-neutral-700 text-white hover:bg-neutral-600'
-                  : 'bg-white text-black hover:bg-neutral-200'
-              }`}
-            >
-              {isInMyList ? '✓ In My List' : '+ Add to My List'}
-            </button>
-
-            <div>
-              <p className="text-neutral-500 text-xs mb-1">
-                {myRating > 0 ? 'Your rating' : 'Rate this'}
+            {movie.director && (
+              <p className="text-neutral-400 text-sm mb-2">
+                <span className="text-neutral-500">Director: </span>
+                {movie.director}
               </p>
-              <StarRating value={myRating} onChange={handleRate} size="text-xl" />
+            )}
+
+            {movie.cast_members?.length > 0 && (
+              <p className="text-neutral-400 text-sm mb-6">
+                <span className="text-neutral-500">Cast: </span>
+                {movie.cast_members.map((c, i) => (
+                  <span key={c.id}>
+                    <span
+                      onClick={() => navigate(`/actor/${c.id}`)}
+                      className="hover:text-white hover:underline cursor-pointer"
+                    >
+                      {c.name}
+                    </span>
+                    {i < movie.cast_members.length - 1 ? ', ' : ''}
+                  </span>
+                ))}
+              </p>
+            )}
+
+            <div className="flex flex-wrap items-center gap-6">
+              <button
+                onClick={handleToggleMyList}
+                className={`px-6 py-3 rounded font-semibold transition ${
+                  isInMyList
+                    ? 'bg-neutral-700 text-white hover:bg-neutral-600'
+                    : 'bg-white text-black hover:bg-neutral-200'
+                }`}
+              >
+                {isInMyList ? '✓ In My List' : '+ Add to My List'}
+              </button>
+
+              <div>
+                <p className="text-neutral-500 text-xs mb-1">
+                  {myRating > 0 ? 'Your rating' : 'Rate this'}
+                </p>
+                <StarRating value={myRating} onChange={handleRate} size="text-xl" />
+              </div>
             </div>
           </div>
         </div>

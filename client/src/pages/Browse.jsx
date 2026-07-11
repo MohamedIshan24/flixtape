@@ -14,6 +14,7 @@ export default function Browse() {
   const [recommendations, setRecommendations] = useState([])
   const [trending, setTrending] = useState([])
   const [featured, setFeatured] = useState([])
+  const [series, setSeries] = useState([])
   const [genres, setGenres] = useState([])
   const [genreMovies, setGenreMovies] = useState({})
   const [searchResults, setSearchResults] = useState(null)
@@ -28,21 +29,23 @@ export default function Browse() {
       try {
         const kidsFilter = isKids ? { kids_friendly: true } : {}
 
-        const [historyRes, recommendationsRes, trendingRes, featuredRes, genresRes] = await Promise.all([
+        const [historyRes, recommendationsRes, trendingRes, featuredRes, seriesRes, genresRes] = await Promise.all([
           getWatchHistory(activeProfile.id),
           getRecommendations(activeProfile.id),
-          getMovies({ trending: true, ...kidsFilter }),
-          getMovies({ featured: true, ...kidsFilter }),
+          getMovies({ trending: true, type: 'movie', ...kidsFilter }),
+          getMovies({ featured: true, type: 'movie', ...kidsFilter }),
+          getMovies({ type: 'series', ...kidsFilter }),
           getGenres(),
         ])
         setContinueWatching(historyRes.data)
         setRecommendations(recommendationsRes.data)
         setTrending(trendingRes.data)
         setFeatured(featuredRes.data)
+        setSeries(seriesRes.data)
         setGenres(genresRes.data)
 
         const genreResults = await Promise.all(
-          genresRes.data.map((genre) => getMovies({ genre_id: genre.id, ...kidsFilter }))
+          genresRes.data.map((genre) => getMovies({ genre_id: genre.id, type: 'movie', ...kidsFilter }))
         )
         const genreMap = {}
         genresRes.data.forEach((genre, i) => {
@@ -89,7 +92,7 @@ export default function Browse() {
     }
   }, [])
 
-  const heroMovie = featured[0]
+  const heroMovie = featured[0] || series[0]
 
   if (isLoading) {
     return (
@@ -140,8 +143,9 @@ export default function Browse() {
 
           <MovieRow title="Continue Watching" movies={continueWatching} showProgress />
           <MovieRow title="Recommended for You" movies={recommendations} />
-          <MovieRow title="Trending Now" movies={trending} />
-          <MovieRow title="Featured" movies={featured} />
+          <MovieRow title="TV Series" movies={series} />
+          <MovieRow title="Trending Movies" movies={trending} />
+          <MovieRow title="Featured Movies" movies={featured} />
           {visibleGenres.map((genre) => (
             <MovieRow key={genre.id} title={genre.name} movies={genreMovies[genre.id]} />
           ))}

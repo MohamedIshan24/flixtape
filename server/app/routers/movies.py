@@ -43,7 +43,7 @@ def create_movie(
     data = movie_in.model_dump(exclude={"genre_ids", "cast_member_ids"})
     new_movie = models.Movie(**data)
     db.add(new_movie)
-    db.flush()  # get new_movie.id without committing yet
+    db.flush()
 
     _attach_genres_and_cast(new_movie, db, movie_in.genre_ids, movie_in.cast_member_ids)
 
@@ -60,6 +60,7 @@ def list_movies(
     genre_id: str | None = None,
     search: str | None = None,
     kids_friendly: bool | None = None,
+    type: str | None = None,
 ):
     query = db.query(models.Movie)
     if trending is not None:
@@ -72,6 +73,8 @@ def list_movies(
         query = query.filter(models.Movie.title.ilike(f"%{search}%"))
     if kids_friendly:
         query = query.filter(models.Movie.genres.any(models.Genre.name == KIDS_GENRE_NAME))
+    if type is not None:
+        query = query.filter(models.Movie.type == type)
     return query.all()
 
 

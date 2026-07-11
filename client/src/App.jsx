@@ -8,6 +8,7 @@ import MyList from './pages/MyList'
 import AdminDashboard from './pages/AdminDashboard'
 import Pricing from './pages/Pricing'
 import Account from './pages/Account'
+import ActorDetail from './pages/ActorDetail'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
 
@@ -38,6 +39,14 @@ function App() {
           element={
             <ProtectedRoute>
               <MovieDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/actor/:castId"
+          element={
+            <ProtectedRoute>
+              <ActorDetail />
             </ProtectedRoute>
           }
         />

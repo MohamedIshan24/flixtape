@@ -56,15 +56,21 @@ export default function AdminAnalytics() {
       </div>
 
       <div>
-        <h3 className="text-lg font-bold mb-4">Most Rated Titles</h3>
+        <h3 className="text-lg font-bold mb-4">Top Rated Titles (Average Rating)</h3>
         {hasRated ? (
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data.most_rated} layout="vertical" margin={{ left: 40 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis type="number" stroke="#999" allowDecimals={false} />
+              <XAxis type="number" domain={[0, 10]} stroke="#999" />
               <YAxis type="category" dataKey="title" stroke="#999" width={150} />
-              <Tooltip contentStyle={{ backgroundColor: '#171717', border: '1px solid #333' }} />
-              <Bar dataKey="value" fill="#f59e0b" name="Rating count" />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#171717', border: '1px solid #333' }}
+                formatter={(value, name, props) => [
+                  `${value} / 10 (${props.payload.rating_count} ratings)`,
+                  'Average rating',
+                ]}
+              />
+              <Bar dataKey="average_rating" fill="#f59e0b" name="Average rating" />
             </BarChart>
           </ResponsiveContainer>
         ) : (

@@ -189,7 +189,7 @@ export default function AdminMovies() {
       )}
 
       {isFormOpen && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center px-4 overflow-y-auto py-8 z-20">
+        <div className="fixed inset-0 bg-black/80 flex items-start justify-center px-4 overflow-y-auto py-8 z-20">          
           <form
             onSubmit={handleSubmit}
             className="bg-neutral-900 p-6 rounded-md w-full max-w-2xl space-y-4"

@@ -32,16 +32,27 @@ def get_analytics(
         for row in most_watched_rows
     ]
 
-    # Most rated: use existing rating_count column on Movie, top 10
+    # Most rated: actual average rating (from Rating table), not just count
     most_rated_rows = (
-        db.query(models.Movie.id, models.Movie.title, models.Movie.rating_count)
-        .filter(models.Movie.rating_count > 0)
-        .order_by(models.Movie.rating_count.desc())
+        db.query(
+            models.Movie.id,
+            models.Movie.title,
+            func.avg(models.Rating.rating).label("average_rating"),
+            func.count(models.Rating.id).label("rating_count"),
+        )
+        .join(models.Rating, models.Rating.movie_id == models.Movie.id)
+        .group_by(models.Movie.id, models.Movie.title)
+        .order_by(func.avg(models.Rating.rating).desc())
         .limit(10)
         .all()
     )
     most_rated = [
-        schemas.MovieStatOut(id=row.id, title=row.title, value=row.rating_count)
+        schemas.MovieAvgRatingOut(
+            id=row.id,
+            title=row.title,
+            average_rating=round(float(row.average_rating), 1),
+            rating_count=row.rating_count,
+        )
         for row in most_rated_rows
     ]
 

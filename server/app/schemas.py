@@ -88,6 +88,10 @@ class CastMemberOut(BaseModel):
     photo_url: str | None
 
 
+class CastMemberDetailOut(CastMemberOut):
+    movies: list[MovieOut] = []
+
+
 # ---------- Episode ----------
 
 class EpisodeCreate(BaseModel):
@@ -293,9 +297,16 @@ class PlanBreakdown(BaseModel):
     count: int
 
 
+class MovieAvgRatingOut(BaseModel):
+    id: uuid.UUID
+    title: str
+    average_rating: float
+    rating_count: int
+
+
 class AnalyticsOut(BaseModel):
     most_watched: list[MovieStatOut]
-    most_rated: list[MovieStatOut]
+    most_rated: list[MovieAvgRatingOut]
     signups_over_time: list[SignupPoint]
     active_subscriptions_by_plan: list[PlanBreakdown]
 

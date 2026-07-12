@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getMovies } from '../api/movies'
+import Footer from '../components/Footer'
 
 const FEATURES = [
   {
@@ -141,6 +142,8 @@ export default function LandingPage() {
           Sign Up Now
         </Link>
       </div>
+
+      <Footer />
     </div>
   )
 }

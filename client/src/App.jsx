@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import LandingPage from './pages/LandingPage'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Profiles from './pages/Profiles'
@@ -11,13 +12,36 @@ import Account from './pages/Account'
 import ActorDetail from './pages/ActorDetail'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
+import GuestRoute from './components/GuestRoute'
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route
+          path="/"
+          element={
+            <GuestRoute>
+              <LandingPage />
+            </GuestRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <GuestRoute>
+              <Login />
+            </GuestRoute>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <GuestRoute>
+              <Signup />
+            </GuestRoute>
+          }
+        />
         <Route
           path="/profiles"
           element={
@@ -84,7 +108,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/" element={<Navigate to="/profiles" replace />} />
       </Routes>
     </BrowserRouter>
   )

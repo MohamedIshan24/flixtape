@@ -324,3 +324,27 @@ class NotificationOut(BaseModel):
     is_read: bool
     created_at: datetime
     movie: MovieOut
+
+
+# ---------- Episode Rating ----------
+
+class EpisodeRatingBase(BaseModel):
+    rating: int = Field(..., ge=1, le=10)
+
+class EpisodeRatingCreate(EpisodeRatingBase):
+    episode_id: uuid.UUID
+
+class EpisodeRatingOut(EpisodeRatingBase):
+    id: uuid.UUID
+    profile_id: uuid.UUID
+    episode_id: uuid.UUID
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class RatingSummaryOut(BaseModel):
+    average_rating: float
+    rating_count: int

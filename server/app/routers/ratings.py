@@ -44,7 +44,12 @@ def upsert_rating(
     movie = db.query(models.Movie).filter(models.Movie.id == rating_in.movie_id).first()
     if not movie:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Movie not found")
-
+    if movie.type == models.MovieType.series:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This title is a series — rate individual episodes instead.",
+        )
+    
     existing = db.query(models.Rating).filter(
         models.Rating.profile_id == profile_id,
         models.Rating.movie_id == rating_in.movie_id

@@ -5,6 +5,7 @@ import Signup from './pages/Signup'
 import Profiles from './pages/Profiles'
 import Browse from './pages/Browse'
 import MovieDetail from './pages/MovieDetail'
+import EpisodeDetail from './pages/EpisodeDetail'
 import MyList from './pages/MyList'
 import AdminDashboard from './pages/AdminDashboard'
 import Pricing from './pages/Pricing'
@@ -63,6 +64,14 @@ function App() {
           element={
             <ProtectedRoute>
               <MovieDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/movie/:movieId/episode/:episodeId"
+          element={
+            <ProtectedRoute>
+              <EpisodeDetail />
             </ProtectedRoute>
           }
         />

@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import ReactPlayer from 'react-player'
 import { getMovie } from '../api/movies'
 import { getMyList, addToMyList, removeFromMyList } from '../api/myList'
-import { upsertWatchHistory, getWatchHistory } from '../api/watchHistory'
 import { upsertRating, getRating } from '../api/ratings'
+import { getSeasonRatingSummary, getSeriesRatingSummary } from '../api/episodeRatings'
 import { useProfiles } from '../context/ProfileContext'
 import StarRating from '../components/StarRating'
 
@@ -16,14 +16,11 @@ export default function MovieDetail() {
   const [movie, setMovie] = useState(null)
   const [isInMyList, setIsInMyList] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [startTime, setStartTime] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(false)
   const [selectedSeasonId, setSelectedSeasonId] = useState(null)
-  const [selectedEpisodeId, setSelectedEpisodeId] = useState(null)
-  const [myRating, setMyRating] = useState(0)
-  const [isSavingRating, setIsSavingRating] = useState(false)
 
-  const lastSavedRef = useRef(0)
+  const [myRating, setMyRating] = useState(0)
+  const [seriesSummary, setSeriesSummary] = useState(null)
+  const [seasonSummaries, setSeasonSummaries] = useState({})
 
   const isSeries = movie?.type === 'series'
 
@@ -32,56 +29,51 @@ export default function MovieDetail() {
     [movie, selectedSeasonId]
   )
 
-  const selectedEpisode = useMemo(
-    () => selectedSeason?.episodes?.find((e) => e.id === selectedEpisodeId) || null,
-    [selectedSeason, selectedEpisodeId]
-  )
-
   useEffect(() => {
     async function load() {
       setIsLoading(true)
       try {
-        const [movieRes, listRes, historyRes] = await Promise.all([
+        const [movieRes, listRes] = await Promise.all([
           getMovie(movieId),
           getMyList(activeProfile.id),
-          getWatchHistory(activeProfile.id),
         ])
         const movieData = movieRes.data
         setMovie(movieData)
         setIsInMyList(listRes.data.some((entry) => entry.movie.id === movieId))
 
-        try {
-          const ratingRes = await getRating(activeProfile.id, movieId)
-          setMyRating(ratingRes.data.rating)
-        } catch (err) {
-          if (err.response?.status !== 404) {
-            console.error('Failed to load rating', err)
+        if (movieData.type === 'series') {
+          try {
+            const seriesSummaryRes = await getSeriesRatingSummary(movieId)
+            setSeriesSummary(seriesSummaryRes.data)
+          } catch (err) {
+            console.error('Failed to load series rating summary', err)
           }
-          setMyRating(0)
-        }
 
-        const historyForMovie = historyRes.data.filter((entry) => entry.movie.id === movieId)
+          if (movieData.seasons?.length > 0) {
+            setSelectedSeasonId(movieData.seasons[0].id)
 
-        if (movieData.type === 'series' && movieData.seasons?.length > 0) {
-          const episodeHistory = historyForMovie.find((entry) => entry.episode_id)
-          if (episodeHistory) {
-            const season = movieData.seasons.find((s) =>
-              s.episodes.some((e) => e.id === episodeHistory.episode_id)
+            const summaries = {}
+            await Promise.all(
+              movieData.seasons.map(async (season) => {
+                try {
+                  const res = await getSeasonRatingSummary(season.id)
+                  summaries[season.id] = res.data
+                } catch (err) {
+                  console.error('Failed to load season summary', err)
+                }
+              })
             )
-            if (season) {
-              setSelectedSeasonId(season.id)
-              setSelectedEpisodeId(episodeHistory.episode_id)
-              setStartTime(episodeHistory.progress_seconds)
-            }
-          } else {
-            const firstSeason = movieData.seasons[0]
-            setSelectedSeasonId(firstSeason.id)
-            setSelectedEpisodeId(firstSeason.episodes[0]?.id || null)
+            setSeasonSummaries(summaries)
           }
         } else {
-          const plainHistory = historyForMovie.find((entry) => !entry.episode_id)
-          if (plainHistory) {
-            setStartTime(plainHistory.progress_seconds)
+          try {
+            const ratingRes = await getRating(activeProfile.id, movieId)
+            setMyRating(ratingRes.data.rating)
+          } catch (err) {
+            if (err.response?.status !== 404) {
+              console.error('Failed to load rating', err)
+            }
+            setMyRating(0)
           }
         }
       } catch (err) {
@@ -92,30 +84,6 @@ export default function MovieDetail() {
     }
     if (activeProfile) load()
   }, [movieId, activeProfile])
-
-  function handleSelectEpisode(seasonId, episodeId) {
-    setSelectedSeasonId(seasonId)
-    setSelectedEpisodeId(episodeId)
-    setStartTime(0)
-    lastSavedRef.current = 0
-    setIsPlaying(false)
-  }
-
-  const handleProgress = useCallback(
-    (state) => {
-      const seconds = Math.floor(state.playedSeconds)
-      if (Math.abs(seconds - lastSavedRef.current) >= 10) {
-        lastSavedRef.current = seconds
-        upsertWatchHistory(
-          activeProfile.id,
-          movieId,
-          seconds,
-          isSeries ? selectedEpisodeId : null
-        ).catch((err) => console.error('Failed to save watch progress', err))
-      }
-    },
-    [activeProfile, movieId, isSeries, selectedEpisodeId]
-  )
 
   async function handleToggleMyList() {
     try {
@@ -134,23 +102,24 @@ export default function MovieDetail() {
   async function handleRate(star) {
     const previous = myRating
     setMyRating(star)
-    setIsSavingRating(true)
     try {
       const res = await upsertRating(activeProfile.id, movieId, star)
       setMovie((prev) => ({ ...prev, rating: res.data.rating ?? prev.rating }))
     } catch (err) {
       console.error('Failed to save rating', err)
       setMyRating(previous)
-    } finally {
-      setIsSavingRating(false)
     }
+  }
+
+  function goToEpisode(episodeId) {
+    navigate(`/movie/${movieId}/episode/${episodeId}`)
   }
 
   if (isLoading || !movie) {
     return <div className="min-h-screen bg-black text-white flex items-center justify-center">Loading...</div>
   }
 
-  const videoUrl = isSeries ? selectedEpisode?.video_url : movie.video_url
+  const videoUrl = !isSeries ? movie.video_url : null
   const posterUrl = movie.thumbnail_url || movie.banner_url
 
   return (
@@ -162,37 +131,29 @@ export default function MovieDetail() {
       </div>
 
       <div className="px-4 md:px-8">
-        <div className="aspect-video bg-neutral-900 rounded overflow-hidden mb-6 relative">
-          {videoUrl ? (
-            <ReactPlayer
-              key={selectedEpisodeId || movie.id}
-              url={videoUrl}
-              controls
-              playing={isPlaying}
-              width="100%"
-              height="100%"
-              onStart={() => setIsPlaying(true)}
-              onProgress={handleProgress}
-              progressInterval={5000}
-              config={{
-                youtube: {
-                  playerVars: { start: startTime },
-                },
-              }}
-            />
-          ) : posterUrl ? (
-            <div className="w-full h-full relative">
-              <img src={posterUrl} alt={movie.title} className="w-full h-full object-cover opacity-40" />
-              <div className="absolute inset-0 flex items-center justify-center text-neutral-300 text-sm bg-black/30">
-                {isSeries ? 'No video available for this episode yet' : 'No video available for this title yet'}
+        {!isSeries && (
+          <div className="aspect-video bg-neutral-900 rounded overflow-hidden mb-6 relative">
+            {videoUrl ? (
+              <ReactPlayer
+                url={videoUrl}
+                controls
+                width="100%"
+                height="100%"
+              />
+            ) : posterUrl ? (
+              <div className="w-full h-full relative">
+                <img src={posterUrl} alt={movie.title} className="w-full h-full object-cover opacity-40" />
+                <div className="absolute inset-0 flex items-center justify-center text-neutral-300 text-sm bg-black/30">
+                  No video available for this title yet
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-neutral-500">
-              {isSeries ? 'No video available for this episode yet' : 'No video available for this title yet'}
-            </div>
-          )}
-        </div>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-neutral-500">
+                No video available for this title yet
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="max-w-5xl flex flex-col md:flex-row items-start gap-8 mb-6">
           {posterUrl && (
@@ -206,11 +167,14 @@ export default function MovieDetail() {
             <div className="flex items-center gap-3 text-neutral-400 text-sm mb-4">
               {movie.release_year && <span>{movie.release_year}</span>}
               {movie.duration && <span>{movie.duration} min</span>}
-              {movie.rating > 0 && (
+              {!isSeries && movie.rating > 0 && (
                 <span>
                   ★ {movie.rating.toFixed(1)}
                   {movie.rating_count > 0 && ` (${movie.rating_count} rating${movie.rating_count === 1 ? '' : 's'})`}
                 </span>
+              )}
+              {isSeries && seriesSummary && seriesSummary.average_rating > 0 && (
+                <span>★ {seriesSummary.average_rating.toFixed(1)}</span>
               )}
             </div>
             <p className="text-neutral-200 mb-6">{movie.description}</p>
@@ -251,51 +215,55 @@ export default function MovieDetail() {
                 {isInMyList ? '✓ In My List' : '+ Add to My List'}
               </button>
 
-              <div>
-                <p className="text-neutral-500 text-xs mb-1">
-                  {myRating > 0 ? 'Your rating' : 'Rate this'}
-                </p>
-                <StarRating value={myRating} onChange={handleRate} size="text-xl" />
-              </div>
+              {!isSeries && (
+                <div>
+                  <p className="text-neutral-500 text-xs mb-1">
+                    {myRating > 0 ? 'Your rating' : 'Rate this'}
+                  </p>
+                  <StarRating value={myRating} onChange={handleRate} size="text-xl" />
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         {isSeries && movie.seasons?.length > 0 && (
           <div className="max-w-3xl mt-10 mb-10">
-            <div className="flex items-center gap-4 mb-4">
-              <h2 className="text-xl font-bold">Episodes</h2>
-              {movie.seasons.length > 1 && (
-                <select
-                  value={selectedSeasonId || ''}
-                  onChange={(e) => {
-                    const season = movie.seasons.find((s) => s.id === e.target.value)
-                    handleSelectEpisode(season.id, season.episodes[0]?.id || null)
-                  }}
-                  className="bg-neutral-800 text-white rounded px-3 py-2 outline-none focus:ring-2 focus:ring-red-600"
-                >
-                  {movie.seasons.map((season) => (
-                    <option key={season.id} value={season.id}>
+            <h2 className="text-xl font-bold mb-4">Episodes</h2>
+
+            <div className="flex flex-wrap gap-2 mb-6">
+              {movie.seasons.map((season) => {
+                const summary = seasonSummaries[season.id]
+                const isActive = season.id === selectedSeasonId
+                return (
+                  <button
+                    key={season.id}
+                    onClick={() => setSelectedSeasonId(season.id)}
+                    className={`px-4 py-3 rounded flex flex-col items-center min-w-22.5 transition ${
+                      isActive
+                        ? 'bg-red-600 text-white'
+                        : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                    }`}
+                  >
+                    <span className="font-semibold text-sm">
                       Season {season.season_number}
-                      {season.title ? ` — ${season.title}` : ''}
-                    </option>
-                  ))}
-                </select>
-              )}
+                    </span>
+                    {summary && summary.average_rating > 0 && (
+                      <span className="text-xs mt-1 opacity-90">★ {summary.average_rating.toFixed(1)}</span>
+                    )}
+                  </button>
+                )
+              })}
             </div>
 
             <div className="space-y-2">
               {selectedSeason?.episodes.map((episode) => (
                 <div
                   key={episode.id}
-                  onClick={() => handleSelectEpisode(selectedSeason.id, episode.id)}
-                  className={`flex items-center gap-4 p-3 rounded cursor-pointer transition ${
-                    episode.id === selectedEpisodeId
-                      ? 'bg-neutral-800 ring-1 ring-red-600'
-                      : 'bg-neutral-900 hover:bg-neutral-800'
-                  }`}
+                  onClick={() => goToEpisode(episode.id)}
+                  className="flex items-center gap-4 p-3 rounded cursor-pointer transition bg-neutral-900 hover:bg-neutral-800"
                 >
-                  <div className="w-24 h-14 shrink-0 bg-neutral-700 rounded overflow-hidden flex items-center justify-center text-neutral-500 text-xs">
+                  <div className="w-24 h-14 shrink-0 bg-neutral-700 rounded overflow-hidden relative flex items-center justify-center text-neutral-500 text-xs group">
                     {episode.thumbnail_url ? (
                       <img
                         src={episode.thumbnail_url}
@@ -304,6 +272,13 @@ export default function MovieDetail() {
                       />
                     ) : (
                       `E${episode.episode_number}`
+                    )}
+                    {episode.video_url && (
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-white">
+                          <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clipRule="evenodd" />
+                        </svg>
+                      </div>
                     )}
                   </div>
                   <div className="flex-1">

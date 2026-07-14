@@ -30,8 +30,8 @@ export default function MovieRow({ title, movies, showProgress = false }) {
   }
 
   return (
-    <div className="mb-8">
-      <h2 className="text-white text-xl font-semibold mb-3 px-4 md:px-8">{title}</h2>
+    <div className="mb-8 font-display">
+      <h2 className="text-reel text-xl font-bold mb-3 px-4 md:px-8">{title}</h2>
       <div className="flex gap-3 overflow-x-auto px-4 md:px-8 pb-2 scrollbar-hide">
         {movies.map((item) => {
           const movie = item.movie || item
@@ -53,8 +53,8 @@ export default function MovieRow({ title, movies, showProgress = false }) {
               className="shrink-0 w-40 md:w-48 cursor-pointer group"
             >
               <div
-                className={`relative aspect-video bg-neutral-800 rounded overflow-hidden transition ${
-                  hoveredId === movie.id ? 'ring-2 ring-white scale-105' : ''
+                className={`relative aspect-video bg-panel rounded overflow-hidden border border-panel-line transition ${
+                  hoveredId === movie.id ? 'ring-2 ring-flix-red border-transparent scale-105' : ''
                 }`}
               >
                 {isPreviewActive ? (
@@ -74,17 +74,17 @@ export default function MovieRow({ title, movies, showProgress = false }) {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-neutral-500 text-sm text-center px-2">
+                  <div className="w-full h-full flex items-center justify-center text-smoke text-sm text-center px-2">
                     {movie.title}
                   </div>
                 )}
                 {progressPct !== null && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-neutral-600">
-                    <div className="h-full bg-red-600" style={{ width: `${progressPct}%` }} />
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-panel-line">
+                    <div className="h-full bg-flix-red" style={{ width: `${progressPct}%` }} />
                   </div>
                 )}
               </div>
-              <p className="text-neutral-300 text-sm mt-1 truncate group-hover:text-white">
+              <p className="text-smoke text-sm mt-1 truncate group-hover:text-reel transition">
                 {movie.title}
               </p>
             </div>

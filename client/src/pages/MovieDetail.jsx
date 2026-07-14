@@ -116,23 +116,27 @@ export default function MovieDetail() {
   }
 
   if (isLoading || !movie) {
-    return <div className="min-h-screen bg-black text-white flex items-center justify-center">Loading...</div>
+    return (
+      <div className="min-h-screen bg-void text-reel flex items-center justify-center font-display">
+        Loading...
+      </div>
+    )
   }
 
   const videoUrl = !isSeries ? movie.video_url : null
   const posterUrl = movie.thumbnail_url || movie.banner_url
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-void text-reel font-display">
       <div className="px-4 md:px-8 py-4">
-        <button onClick={() => navigate(-1)} className="text-neutral-300 hover:text-white mb-4">
+        <button onClick={() => navigate(-1)} className="text-smoke hover:text-reel mb-4 transition">
           ← Back
         </button>
       </div>
 
       <div className="px-4 md:px-8">
         {!isSeries && (
-          <div className="aspect-video bg-neutral-900 rounded overflow-hidden mb-6 relative">
+          <div className="aspect-video bg-panel rounded overflow-hidden mb-6 relative border border-panel-line">
             {videoUrl ? (
               <ReactPlayer
                 url={videoUrl}
@@ -143,12 +147,12 @@ export default function MovieDetail() {
             ) : posterUrl ? (
               <div className="w-full h-full relative">
                 <img src={posterUrl} alt={movie.title} className="w-full h-full object-cover opacity-40" />
-                <div className="absolute inset-0 flex items-center justify-center text-neutral-300 text-sm bg-black/30">
+                <div className="absolute inset-0 flex items-center justify-center text-smoke text-sm bg-void/40">
                   No video available for this title yet
                 </div>
               </div>
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-neutral-500">
+              <div className="w-full h-full flex items-center justify-center text-smoke">
                 No video available for this title yet
               </div>
             )}
@@ -158,42 +162,44 @@ export default function MovieDetail() {
         <div className="max-w-5xl flex flex-col md:flex-row items-start gap-8 mb-6">
           {posterUrl && (
             <div className="w-40 md:w-48 shrink-0">
-              <img src={posterUrl} alt={movie.title} className="w-full rounded shadow-lg" />
+              <img src={posterUrl} alt={movie.title} className="w-full rounded shadow-lg border border-panel-line" />
             </div>
           )}
 
           <div className="flex-1 max-w-3xl">
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">{movie.title}</h1>
-            <div className="flex items-center gap-3 text-neutral-400 text-sm mb-4">
+            <h1 className="text-3xl md:text-4xl font-extrabold mb-2">{movie.title}</h1>
+            <div className="flex items-center gap-3 text-smoke text-sm mb-4">
               {movie.release_year && <span>{movie.release_year}</span>}
               {movie.duration && <span>{movie.duration} min</span>}
               {!isSeries && movie.rating > 0 && (
-                <span>
+                <span className="text-flix-red font-semibold">
                   ★ {movie.rating.toFixed(1)}
-                  {movie.rating_count > 0 && ` (${movie.rating_count} rating${movie.rating_count === 1 ? '' : 's'})`}
+                  <span className="text-smoke font-normal">
+                    {movie.rating_count > 0 && ` (${movie.rating_count} rating${movie.rating_count === 1 ? '' : 's'})`}
+                  </span>
                 </span>
               )}
               {isSeries && seriesSummary && seriesSummary.average_rating > 0 && (
-                <span>★ {seriesSummary.average_rating.toFixed(1)}</span>
+                <span className="text-flix-red font-semibold">★ {seriesSummary.average_rating.toFixed(1)}</span>
               )}
             </div>
-            <p className="text-neutral-200 mb-6">{movie.description}</p>
+            <p className="text-smoke mb-6">{movie.description}</p>
 
             {movie.director && (
-              <p className="text-neutral-400 text-sm mb-2">
-                <span className="text-neutral-500">Director: </span>
+              <p className="text-smoke text-sm mb-2">
+                <span className="text-smoke/60">Director: </span>
                 {movie.director}
               </p>
             )}
 
             {movie.cast_members?.length > 0 && (
-              <p className="text-neutral-400 text-sm mb-6">
-                <span className="text-neutral-500">Cast: </span>
+              <p className="text-smoke text-sm mb-6">
+                <span className="text-smoke/60">Cast: </span>
                 {movie.cast_members.map((c, i) => (
                   <span key={c.id}>
                     <span
                       onClick={() => navigate(`/actor/${c.id}`)}
-                      className="hover:text-white hover:underline cursor-pointer"
+                      className="hover:text-flix-red hover:underline cursor-pointer transition"
                     >
                       {c.name}
                     </span>
@@ -206,10 +212,10 @@ export default function MovieDetail() {
             <div className="flex flex-wrap items-center gap-6">
               <button
                 onClick={handleToggleMyList}
-                className={`px-6 py-3 rounded font-semibold transition ${
+                className={`px-6 py-3 rounded font-bold transition ${
                   isInMyList
-                    ? 'bg-neutral-700 text-white hover:bg-neutral-600'
-                    : 'bg-white text-black hover:bg-neutral-200'
+                    ? 'bg-panel border border-panel-line text-reel hover:bg-void-soft'
+                    : 'bg-flix-red text-reel hover:bg-flix-red-dim'
                 }`}
               >
                 {isInMyList ? '✓ In My List' : '+ Add to My List'}
@@ -217,7 +223,7 @@ export default function MovieDetail() {
 
               {!isSeries && (
                 <div>
-                  <p className="text-neutral-500 text-xs mb-1">
+                  <p className="text-smoke/70 text-xs mb-1">
                     {myRating > 0 ? 'Your rating' : 'Rate this'}
                   </p>
                   <StarRating value={myRating} onChange={handleRate} size="text-xl" />
@@ -229,7 +235,7 @@ export default function MovieDetail() {
 
         {isSeries && movie.seasons?.length > 0 && (
           <div className="max-w-3xl mt-10 mb-10">
-            <h2 className="text-xl font-bold mb-4">Episodes</h2>
+            <h2 className="text-xl font-extrabold mb-4">Episodes</h2>
 
             <div className="flex flex-wrap gap-2 mb-6">
               {movie.seasons.map((season) => {
@@ -239,10 +245,10 @@ export default function MovieDetail() {
                   <button
                     key={season.id}
                     onClick={() => setSelectedSeasonId(season.id)}
-                    className={`px-4 py-3 rounded flex flex-col items-center min-w-22.5 transition ${
+                    className={`px-4 py-3 rounded flex flex-col items-center min-w-22.5 transition border ${
                       isActive
-                        ? 'bg-red-600 text-white'
-                        : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                        ? 'bg-flix-red text-reel border-flix-red'
+                        : 'bg-panel text-smoke border-panel-line hover:bg-void-soft'
                     }`}
                   >
                     <span className="font-semibold text-sm">
@@ -261,9 +267,9 @@ export default function MovieDetail() {
                 <div
                   key={episode.id}
                   onClick={() => goToEpisode(episode.id)}
-                  className="flex items-center gap-4 p-3 rounded cursor-pointer transition bg-neutral-900 hover:bg-neutral-800"
+                  className="flex items-center gap-4 p-3 rounded cursor-pointer transition bg-panel border border-panel-line hover:bg-void-soft hover:border-flix-red"
                 >
-                  <div className="w-24 h-14 shrink-0 bg-neutral-700 rounded overflow-hidden relative flex items-center justify-center text-neutral-500 text-xs group">
+                  <div className="w-24 h-14 shrink-0 bg-void-soft rounded overflow-hidden relative flex items-center justify-center text-smoke text-xs group">
                     {episode.thumbnail_url ? (
                       <img
                         src={episode.thumbnail_url}
@@ -274,8 +280,8 @@ export default function MovieDetail() {
                       `E${episode.episode_number}`
                     )}
                     {episode.video_url && (
-                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-white">
+                      <div className="absolute inset-0 bg-void/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-reel">
                           <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clipRule="evenodd" />
                         </svg>
                       </div>
@@ -286,11 +292,11 @@ export default function MovieDetail() {
                       {episode.episode_number}. {episode.title}
                     </p>
                     {episode.description && (
-                      <p className="text-neutral-400 text-sm line-clamp-2">{episode.description}</p>
+                      <p className="text-smoke text-sm line-clamp-2">{episode.description}</p>
                     )}
                   </div>
                   {episode.duration && (
-                    <span className="text-neutral-500 text-sm shrink-0">{episode.duration} min</span>
+                    <span className="text-smoke text-sm shrink-0">{episode.duration} min</span>
                   )}
                 </div>
               ))}

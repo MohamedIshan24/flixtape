@@ -24,6 +24,29 @@ const NAV_LINKS = [
   },
 ]
 
+function NavLink({ to, label, icon, isActive }) {
+  return (
+    <Link
+      to={to}
+      className={`relative flex items-center gap-1.5 px-3 py-2 text-sm font-semibold transition ${
+        isActive ? 'text-reel' : 'text-smoke hover:text-reel'
+      }`}
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4">
+        {icon}
+      </svg>
+      {label}
+      {isActive && (
+        <span className="absolute -bottom-1 left-3 right-3 flex justify-between">
+          <i className="block w-1 h-1 rounded-full bg-flix-red" />
+          <i className="block w-1 h-1 rounded-full bg-flix-red" />
+          <i className="block w-1 h-1 rounded-full bg-flix-red" />
+        </span>
+      )}
+    </Link>
+  )
+}
+
 export default function Navbar({ onSearch }) {
   const { activeProfile, clearActiveProfile } = useProfiles()
   const { user } = useAuth()
@@ -43,47 +66,24 @@ export default function Navbar({ onSearch }) {
   }
 
   return (
-    <div className="flex items-center justify-between px-4 md:px-8 py-4 sticky top-0 bg-linear-to-b from-black to-transparent z-10">
+    <div className="flex items-center justify-between px-4 md:px-8 py-4 sticky top-0 bg-linear-to-b from-void to-transparent z-10 font-display">
       <div className="flex items-center gap-6">
-        <Link to="/browse" className="text-red-600 text-2xl font-bold tracking-wide">
+        <Link to="/browse" className="text-flix-red text-2xl font-extrabold tracking-tight">
           FLIXTAPE
         </Link>
 
         <div className="hidden md:flex items-center gap-1">
-          {NAV_LINKS.map((link) => {
-            const isActive = location.pathname === link.to
-            return (
-              <Link
-                key={link.to}
-                to={link.to}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded text-sm font-medium transition ${
-                  isActive
-                    ? 'text-white bg-white/10'
-                    : 'text-neutral-300 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4">
-                  {link.icon}
-                </svg>
-                {link.label}
-              </Link>
-            )
-          })}
+          {NAV_LINKS.map((link) => (
+            <NavLink key={link.to} {...link} isActive={location.pathname === link.to} />
+          ))}
 
           {user?.role === 'admin' && (
-            <Link
+            <NavLink
               to="/admin"
-              className={`flex items-center gap-1.5 px-3 py-2 rounded text-sm font-medium transition ${
-                location.pathname === '/admin'
-                  ? 'text-white bg-white/10'
-                  : 'text-neutral-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
-              </svg>
-              Manage Content
-            </Link>
+              label="Manage Content"
+              isActive={location.pathname === '/admin'}
+              icon={<path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />}
+            />
           )}
         </div>
       </div>
@@ -94,23 +94,23 @@ export default function Navbar({ onSearch }) {
           placeholder="Search titles..."
           value={query}
           onChange={handleSearchChange}
-          className="bg-black/70 border border-neutral-600 text-white text-sm rounded px-3 py-2 w-40 md:w-64 outline-none focus:border-white transition"
+          className="bg-panel/80 border border-panel-line text-reel placeholder-smoke text-sm rounded px-3 py-2 w-40 md:w-64 outline-none focus:border-flix-red transition"
         />
         <NotificationBell />
         {user?.role === 'admin' && (
-          <span className="text-[10px] uppercase tracking-wide bg-red-600 text-white px-2 py-0.5 rounded font-semibold">
+          <span className="text-[10px] uppercase tracking-wide bg-flix-red text-reel px-2 py-0.5 rounded font-bold">
             Admin
           </span>
         )}
         <div className="flex flex-col items-center gap-1">
           <div
             onClick={handleSwitchProfile}
-            className="w-8 h-8 rounded bg-neutral-700 flex items-center justify-center text-white text-sm cursor-pointer hover:ring-2 ring-white"
+            className="w-8 h-8 rounded bg-panel border border-panel-line flex items-center justify-center text-reel text-sm font-semibold cursor-pointer hover:ring-2 ring-flix-red transition"
             title={`Switch profile (currently ${activeProfile?.name})`}
           >
             {activeProfile?.name?.charAt(0).toUpperCase()}
           </div>
-          <span className="text-neutral-400 text-[10px]">{activeProfile?.name}</span>
+          <span className="text-smoke text-[10px]">{activeProfile?.name}</span>
         </div>
       </div>
     </div>

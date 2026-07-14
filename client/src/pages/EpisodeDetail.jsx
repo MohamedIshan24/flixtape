@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import ReactPlayer from 'react-player'
 import { getMovie } from '../api/movies'
 import { upsertWatchHistory, getWatchHistory } from '../api/watchHistory'
@@ -120,9 +120,9 @@ export default function EpisodeDetail() {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="px-4 md:px-8 py-4">
-        <Link to={`/movie/${movieId}`} className="text-neutral-300 hover:text-white">
+        <button onClick={() => navigate(-1)} className="text-neutral-300 hover:text-white">
           ← Back to {movie.title}
-        </Link>
+        </button>
       </div>
 
       <div className="px-4 md:px-8">

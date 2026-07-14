@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { getMovies } from '../api/movies'
 import Footer from '../components/Footer'
+import FilmSprocket from '../components/FilmSprocket'
 
 const FEATURES = [
   {
@@ -36,6 +37,8 @@ const FEATURES = [
 
 export default function LandingPage() {
   const [trending, setTrending] = useState([])
+  const [email, setEmail] = useState('')
+  const navigate = useNavigate()
 
   useEffect(() => {
     async function load() {
@@ -49,95 +52,132 @@ export default function LandingPage() {
     load()
   }, [])
 
+  function handleGetStarted(e) {
+    e.preventDefault()
+    const params = email ? `?email=${encodeURIComponent(email)}` : ''
+    navigate(`/signup${params}`)
+  }
+
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-void text-reel font-display">
+      {/* Nav */}
+      <div className="absolute top-0 inset-x-0 z-20 flex items-center justify-between px-4 md:px-10 py-6">
+        <span className="text-flix-red text-2xl font-extrabold tracking-tight">FLIXTAPE</span>
+        <Link
+          to="/login"
+          className="border border-smoke/40 hover:border-reel text-reel font-semibold px-5 py-2 rounded text-sm transition"
+        >
+          Sign In
+        </Link>
+      </div>
+
       {/* Hero */}
-      <div className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-black">
-        <div className="absolute inset-0 bg-linear-to-br from-neutral-900 via-black to-red-950/40" />
+      <div className="relative h-[92vh] flex items-center overflow-hidden bg-void">
         <div
-          className="absolute inset-0 opacity-25"
+          className="absolute inset-0"
           style={{
             backgroundImage:
-              'radial-gradient(circle at 20% 30%, rgba(220,38,38,0.3) 0%, transparent 40%), radial-gradient(circle at 80% 70%, rgba(220,38,38,0.2) 0%, transparent 40%)',
+              'radial-gradient(ellipse 65% 70% at 12% 25%, rgba(229,9,20,0.22) 0%, transparent 55%), radial-gradient(ellipse 55% 55% at 90% 80%, rgba(229,9,20,0.12) 0%, transparent 50%)',
           }}
         />
-        <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/40 to-black" />
+        <div className="absolute inset-0 bg-linear-to-b from-transparent via-void/30 to-void" />
+        <div className="grain-overlay" />
+        <div className="scanlines" />
 
-        <div className="relative z-10 text-center px-4 max-w-2xl">
-          <h1 className="text-red-600 text-4xl md:text-6xl font-bold tracking-wide mb-4">
-            FLIXTAPE
+        <div className="relative z-10 px-4 md:px-10 max-w-2xl">
+          <p className="text-flix-red text-xs md:text-sm font-bold tracking-[0.35em] uppercase mb-4">
+            Now recording
+          </p>
+          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-5">
+            Movies, series, and a watchlist that's actually yours.
           </h1>
-          <p className="text-lg md:text-2xl font-medium mb-3">
-            Unlimited movies, TV shows, and more.
+          <p className="text-smoke text-base md:text-lg mb-8 max-w-xl">
+            No cable box, no ads, no algorithm guessing games — just the titles you
+            queue up, rated and ranked by the people watching them. Cancel anytime.
           </p>
-          <p className="text-neutral-300 mb-8">
-            Personalized profiles. Real recommendations. No ads, ever.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              to="/signup"
-              className="bg-red-600 hover:bg-red-700 text-white font-semibold px-8 py-3 rounded text-lg transition w-full sm:w-auto"
+
+          <form onSubmit={handleGetStarted} className="flex flex-col sm:flex-row gap-3 max-w-lg">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email address"
+              className="flex-1 bg-panel/80 border border-panel-line text-reel placeholder-smoke rounded px-4 py-3.5 outline-none focus:border-flix-red focus:ring-1 focus:ring-flix-red transition"
+            />
+            <button
+              type="submit"
+              className="bg-flix-red hover:bg-flix-red-dim text-reel font-bold px-6 py-3.5 rounded transition whitespace-nowrap"
             >
-              Get Started
-            </Link>
-            <Link
-              to="/login"
-              className="border border-neutral-500 hover:border-white text-white font-semibold px-8 py-3 rounded text-lg transition w-full sm:w-auto"
-            >
-              Sign In
-            </Link>
-          </div>
+              Get Started &rarr;
+            </button>
+          </form>
         </div>
       </div>
 
+      <FilmSprocket />
+
       {/* Trending row */}
       {trending.length > 0 && (
-        <div className="px-4 md:px-8 py-16 -mt-24 relative z-10">
-          <h2 className="text-2xl md:text-3xl font-bold mb-6">Trending Now</h2>
-          <div className="flex gap-4 overflow-x-auto pb-4">
-            {trending.map((movie) => (
-              <div key={movie.id} className="w-40 md:w-48 shrink-0">
-                <div className="aspect-video bg-neutral-800 rounded overflow-hidden">
+        <div className="px-4 md:px-10 py-16 bg-void">
+          <h2 className="text-2xl md:text-3xl font-extrabold mb-7">On the Reel Right Now</h2>
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+            {trending.map((movie, i) => (
+              <div key={movie.id} className="w-36 md:w-44 shrink-0 group">
+                <div className="relative aspect-2/3 bg-panel rounded overflow-hidden border border-panel-line group-hover:border-flix-red transition">
                   {movie.thumbnail_url ? (
-                    <img src={movie.thumbnail_url} alt={movie.title} className="w-full h-full object-cover" />
+                    <img
+                      src={movie.thumbnail_url}
+                      alt={movie.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-neutral-500 text-sm text-center px-2">
+                    <div className="w-full h-full flex items-center justify-center text-smoke text-sm text-center px-2">
                       {movie.title}
                     </div>
                   )}
+                  <span className="absolute top-2 left-2 text-flix-red text-3xl font-extrabold [text-shadow:-1px_-1px_0_#000,1px_-1px_0_#000,-1px_1px_0_#000,1px_1px_0_#000]">
+                    {i + 1}
+                  </span>
                 </div>
-                <p className="text-neutral-300 text-sm mt-2 truncate">{movie.title}</p>
+                <p className="text-smoke text-sm mt-2 truncate group-hover:text-reel transition">
+                  {movie.title}
+                </p>
               </div>
             ))}
           </div>
         </div>
       )}
 
+      <FilmSprocket variant="panel" />
+
       {/* Features */}
-      <div className="px-4 md:px-8 py-16 bg-neutral-950">
-        <h2 className="text-2xl md:text-3xl font-bold mb-10 text-center">Why Flixtape</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+      <div className="px-4 md:px-10 py-16 bg-void-soft">
+        <h2 className="text-2xl md:text-3xl font-extrabold mb-10 text-center">Why Flixtape</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
           {FEATURES.map((feature) => (
-            <div key={feature.title} className="text-center">
-              <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-red-600/20 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-7 h-7 text-red-500">
+            <div
+              key={feature.title}
+              className="bg-panel border-l-4 border-flix-red rounded px-5 py-6"
+            >
+              <div className="w-11 h-11 mb-4 rounded-full bg-flix-red/15 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6 text-flix-red">
                   {feature.icon}
                 </svg>
               </div>
-              <h3 className="font-semibold mb-2">{feature.title}</h3>
-              <p className="text-neutral-400 text-sm">{feature.description}</p>
+              <h3 className="font-bold mb-2">{feature.title}</h3>
+              <p className="text-smoke text-sm">{feature.description}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Final CTA */}
-      <div className="px-4 py-20 text-center border-t border-neutral-800">
-        <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to watch?</h2>
-        <p className="text-neutral-400 mb-8">Create your account and start streaming in seconds.</p>
+      <div className="px-4 py-20 text-center border-t border-panel-line bg-void">
+        <h2 className="text-2xl md:text-3xl font-extrabold mb-4">Ready to press play?</h2>
+        <p className="text-smoke mb-8">Create your account and start streaming in seconds.</p>
         <Link
           to="/signup"
-          className="bg-red-600 hover:bg-red-700 text-white font-semibold px-8 py-3 rounded text-lg transition inline-block"
+          className="bg-flix-red hover:bg-flix-red-dim text-reel font-bold px-8 py-3 rounded text-lg transition inline-block"
         >
           Sign Up Now
         </Link>

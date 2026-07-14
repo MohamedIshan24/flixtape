@@ -7,7 +7,7 @@ export default function StarRating({ value, onChange, size = 'text-2xl' }) {
           type="button"
           onClick={() => onChange(star)}
           className={`${size} transition-colors ${
-            star <= value ? 'text-red-500' : 'text-neutral-600 hover:text-neutral-400'
+            star <= value ? 'text-flix-red' : 'text-panel-line hover:text-smoke'
           }`}
           aria-label={`Rate ${star} out of 10`}
         >

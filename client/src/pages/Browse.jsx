@@ -100,7 +100,7 @@ export default function Browse() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-void">
         <Navbar onSearch={() => {}} />
         <HeroSkeleton />
         <MovieRowSkeleton />
@@ -114,20 +114,20 @@ export default function Browse() {
   const visibleGenres = genres.filter((genre) => (genreMovies[genre.id]?.length ?? 0) > 0)
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-void font-display">
       <Navbar onSearch={handleSearch} />
 
       {searchResults !== null ? (
         <div className="pt-4">
           {searchResults.length === 0 ? (
             <div className="flex flex-col items-center justify-center text-center py-24 px-4">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-16 h-16 text-neutral-600 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-16 h-16 text-panel-line mb-4">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
               </svg>
-              <h2 className="text-white text-lg font-semibold mb-2">
-                No results for "{lastQuery}"
+              <h2 className="text-reel text-lg font-bold mb-2">
+                No results for &quot;{lastQuery}&quot;
               </h2>
-              <p className="text-neutral-400 text-sm max-w-sm">
+              <p className="text-smoke text-sm max-w-sm">
                 Try a different title, or check your spelling.
               </p>
             </div>
@@ -146,12 +146,13 @@ export default function Browse() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-neutral-900" />
+                <div className="w-full h-full bg-panel" />
               )}
-              <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-void via-void/50 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-r from-void/60 via-transparent to-transparent" />
               <div className="absolute bottom-10 left-4 md:left-8 max-w-lg">
-                <h1 className="text-white text-3xl md:text-5xl font-bold mb-3">{heroMovie.title}</h1>
-                <p className="text-neutral-200 text-sm md:text-base line-clamp-3">{heroMovie.description}</p>
+                <h1 className="text-reel text-3xl md:text-5xl font-extrabold mb-3">{heroMovie.title}</h1>
+                <p className="text-smoke text-sm md:text-base line-clamp-3">{heroMovie.description}</p>
               </div>
             </div>
           )}

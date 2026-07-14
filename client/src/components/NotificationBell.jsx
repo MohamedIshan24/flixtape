@@ -61,44 +61,44 @@ export default function NotificationBell() {
   }
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative font-display" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className="relative text-neutral-300 hover:text-white"
+        className="relative text-smoke hover:text-reel transition"
         aria-label="Notifications"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
           <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
         </svg>
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 bg-flix-red text-reel text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-neutral-900 border border-neutral-700 rounded shadow-lg z-20">
+        <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-panel border border-panel-line rounded shadow-lg z-20">
           {notifications.length === 0 ? (
-            <p className="text-neutral-400 text-sm p-4">No notifications yet.</p>
+            <p className="text-smoke text-sm p-4">No notifications yet.</p>
           ) : (
             notifications.map((notification) => (
               <div
                 key={notification.id}
                 onClick={() => handleNotificationClick(notification)}
-                className={`flex items-start justify-between gap-2 p-3 border-b border-neutral-800 cursor-pointer hover:bg-neutral-800 ${
+                className={`flex items-start justify-between gap-2 p-3 border-b border-panel-line cursor-pointer hover:bg-void-soft transition ${
                   notification.is_read ? 'opacity-60' : ''
                 }`}
               >
                 <div>
-                  <p className="text-sm text-white">{notification.message}</p>
-                  <p className="text-xs text-neutral-500 mt-1">
+                  <p className="text-sm text-reel">{notification.message}</p>
+                  <p className="text-xs text-smoke mt-1">
                     {new Date(notification.created_at).toLocaleDateString()}
                   </p>
                 </div>
                 <button
                   onClick={(e) => handleDismiss(e, notification.id)}
-                  className="text-neutral-500 hover:text-white text-xs shrink-0"
+                  className="text-smoke hover:text-reel text-xs shrink-0 transition"
                   aria-label="Dismiss"
                 >
                   ✕

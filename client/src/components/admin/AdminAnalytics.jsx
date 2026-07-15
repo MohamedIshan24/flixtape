@@ -5,7 +5,10 @@ import {
 } from 'recharts'
 import { getAnalytics } from '../../api/analytics'
 
-const COLORS = ['#dc2626', '#f59e0b', '#10b981', '#3b82f6']
+const COLORS = ['#e50914', '#f59e0b', '#10b981', '#3b82f6']
+const GRID_STROKE = '#262626'
+const AXIS_STROKE = '#a3a3a6'
+const TOOLTIP_STYLE = { backgroundColor: '#171717', border: '1px solid #262626' }
 
 export default function AdminAnalytics() {
   const [data, setData] = useState(null)
@@ -27,8 +30,8 @@ export default function AdminAnalytics() {
     load()
   }, [])
 
-  if (isLoading) return <p className="text-neutral-400">Loading analytics...</p>
-  if (error) return <p className="text-orange-400">{error}</p>
+  if (isLoading) return <p className="text-smoke">Loading analytics...</p>
+  if (error) return <p className="text-flix-red">{error}</p>
   if (!data) return null
 
   const hasWatched = data.most_watched.length > 0
@@ -37,34 +40,34 @@ export default function AdminAnalytics() {
   const hasPlans = data.active_subscriptions_by_plan.length > 0
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 text-reel">
       <div>
-        <h3 className="text-lg font-bold mb-4">Most Watched Titles</h3>
+        <h3 className="text-lg font-extrabold mb-4">Most Watched Titles</h3>
         {hasWatched ? (
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data.most_watched} layout="vertical" margin={{ left: 40 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis type="number" stroke="#999" allowDecimals={false} />
-              <YAxis type="category" dataKey="title" stroke="#999" width={150} />
-              <Tooltip contentStyle={{ backgroundColor: '#171717', border: '1px solid #333' }} />
-              <Bar dataKey="value" fill="#dc2626" name="Profiles watched" />
+              <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
+              <XAxis type="number" stroke={AXIS_STROKE} allowDecimals={false} />
+              <YAxis type="category" dataKey="title" stroke={AXIS_STROKE} width={150} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} />
+              <Bar dataKey="value" fill="#e50914" name="Profiles watched" />
             </BarChart>
           </ResponsiveContainer>
         ) : (
-          <p className="text-neutral-500 text-sm">No watch data yet.</p>
+          <p className="text-smoke text-sm">No watch data yet.</p>
         )}
       </div>
 
       <div>
-        <h3 className="text-lg font-bold mb-4">Top Rated Titles (Average Rating)</h3>
+        <h3 className="text-lg font-extrabold mb-4">Top Rated Titles (Average Rating)</h3>
         {hasRated ? (
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data.most_rated} layout="vertical" margin={{ left: 40 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis type="number" domain={[0, 10]} stroke="#999" />
-              <YAxis type="category" dataKey="title" stroke="#999" width={150} />
+              <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
+              <XAxis type="number" domain={[0, 10]} stroke={AXIS_STROKE} />
+              <YAxis type="category" dataKey="title" stroke={AXIS_STROKE} width={150} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#171717', border: '1px solid #333' }}
+                contentStyle={TOOLTIP_STYLE}
                 formatter={(value, name, props) => [
                   `${value} / 10 (${props.payload.rating_count} ratings)`,
                   'Average rating',
@@ -74,29 +77,29 @@ export default function AdminAnalytics() {
             </BarChart>
           </ResponsiveContainer>
         ) : (
-          <p className="text-neutral-500 text-sm">No ratings yet.</p>
+          <p className="text-smoke text-sm">No ratings yet.</p>
         )}
       </div>
 
       <div>
-        <h3 className="text-lg font-bold mb-4">Signups (Last 12 Months)</h3>
+        <h3 className="text-lg font-extrabold mb-4">Signups (Last 12 Months)</h3>
         {hasSignups ? (
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={data.signups_over_time}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis dataKey="month" stroke="#999" />
-              <YAxis stroke="#999" allowDecimals={false} />
-              <Tooltip contentStyle={{ backgroundColor: '#171717', border: '1px solid #333' }} />
-              <Line type="monotone" dataKey="count" stroke="#dc2626" strokeWidth={2} name="Signups" />
+              <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
+              <XAxis dataKey="month" stroke={AXIS_STROKE} />
+              <YAxis stroke={AXIS_STROKE} allowDecimals={false} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} />
+              <Line type="monotone" dataKey="count" stroke="#e50914" strokeWidth={2} name="Signups" />
             </LineChart>
           </ResponsiveContainer>
         ) : (
-          <p className="text-neutral-500 text-sm">No signup data yet.</p>
+          <p className="text-smoke text-sm">No signup data yet.</p>
         )}
       </div>
 
       <div>
-        <h3 className="text-lg font-bold mb-4">Active Subscriptions by Plan</h3>
+        <h3 className="text-lg font-extrabold mb-4">Active Subscriptions by Plan</h3>
         {hasPlans ? (
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -113,12 +116,12 @@ export default function AdminAnalytics() {
                   <Cell key={entry.plan} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip contentStyle={{ backgroundColor: '#171717', border: '1px solid #333' }} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} />
               <Legend />
             </PieChart>
           </ResponsiveContainer>
         ) : (
-          <p className="text-neutral-500 text-sm">No active subscriptions yet.</p>
+          <p className="text-smoke text-sm">No active subscriptions yet.</p>
         )}
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { createSeason, deleteSeason } from '../../api/seasons'
 import { createEpisode, updateEpisode, deleteEpisode } from '../../api/episodes'
 
@@ -10,6 +10,9 @@ const emptyEpisodeForm = {
   video_url: '',
   thumbnail_url: '',
 }
+
+const inputClass =
+  'bg-void border border-panel-line text-reel placeholder-smoke rounded px-3 py-2 outline-none focus:border-flix-red focus:ring-1 focus:ring-flix-red transition'
 
 export default function SeasonEpisodeManager({ movieId, seasons, onSeasonsChange }) {
   const [newSeasonNumber, setNewSeasonNumber] = useState('')
@@ -113,10 +116,10 @@ export default function SeasonEpisodeManager({ movieId, seasons, onSeasonsChange
   }
 
   return (
-    <div className="border-t border-neutral-700 pt-4 mt-2">
-      <h3 className="text-lg font-semibold mb-3">Seasons & Episodes</h3>
+    <div className="border-t border-panel-line pt-4 mt-2">
+      <h3 className="text-lg font-extrabold mb-3">Seasons & Episodes</h3>
 
-      {error && <p className="text-orange-400 mb-3 text-sm">{error}</p>}
+      {error && <p className="text-flix-red mb-3 text-sm">{error}</p>}
 
       <form onSubmit={handleAddSeason} className="flex gap-2 mb-4 flex-wrap">
         <input
@@ -124,7 +127,7 @@ export default function SeasonEpisodeManager({ movieId, seasons, onSeasonsChange
           placeholder="Season #"
           value={newSeasonNumber}
           onChange={(e) => setNewSeasonNumber(e.target.value)}
-          className="bg-neutral-800 rounded px-3 py-2 w-28 outline-none focus:ring-2 focus:ring-red-600"
+          className={`${inputClass} w-28`}
           required
         />
         <input
@@ -132,21 +135,21 @@ export default function SeasonEpisodeManager({ movieId, seasons, onSeasonsChange
           placeholder="Season title (optional)"
           value={newSeasonTitle}
           onChange={(e) => setNewSeasonTitle(e.target.value)}
-          className="bg-neutral-800 rounded px-3 py-2 flex-1 outline-none focus:ring-2 focus:ring-red-600"
+          className={`${inputClass} flex-1`}
         />
-        <button type="submit" className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded font-medium">
+        <button type="submit" className="bg-flix-red hover:bg-flix-red-dim text-reel px-4 py-2 rounded font-semibold transition">
           Add Season
         </button>
       </form>
 
       <div className="space-y-3">
         {seasons.map((season) => (
-          <div key={season.id} className="bg-neutral-800 rounded p-3">
+          <div key={season.id} className="bg-void-soft border border-panel-line rounded p-3">
             <div className="flex items-center justify-between">
-              <span className="font-medium">
+              <span className="font-semibold">
                 Season {season.season_number}
                 {season.title ? ` — ${season.title}` : ''}
-                <span className="text-neutral-400 text-sm ml-2">
+                <span className="text-smoke text-sm ml-2">
                   ({season.episodes.length} episode{season.episodes.length !== 1 ? 's' : ''})
                 </span>
               </span>
@@ -154,14 +157,14 @@ export default function SeasonEpisodeManager({ movieId, seasons, onSeasonsChange
                 <button
                   type="button"
                   onClick={() => openAddEpisode(season.id)}
-                  className="text-neutral-300 hover:text-white"
+                  className="text-smoke hover:text-reel transition"
                 >
                   + Episode
                 </button>
                 <button
                   type="button"
                   onClick={() => handleDeleteSeason(season.id)}
-                  className="text-neutral-300 hover:text-red-500"
+                  className="text-smoke hover:text-flix-red transition"
                 >
                   Delete Season
                 </button>
@@ -173,7 +176,7 @@ export default function SeasonEpisodeManager({ movieId, seasons, onSeasonsChange
                 {season.episodes.map((ep) => (
                   <div
                     key={ep.id}
-                    className="flex items-center justify-between bg-neutral-900 rounded px-3 py-2 text-sm"
+                    className="flex items-center justify-between bg-panel rounded px-3 py-2 text-sm"
                   >
                     <span>
                       E{ep.episode_number}: {ep.title}
@@ -182,14 +185,14 @@ export default function SeasonEpisodeManager({ movieId, seasons, onSeasonsChange
                       <button
                         type="button"
                         onClick={() => openEditEpisode(season.id, ep)}
-                        className="text-neutral-300 hover:text-white"
+                        className="text-smoke hover:text-reel transition"
                       >
                         Edit
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDeleteEpisode(season.id, ep.id)}
-                        className="text-neutral-300 hover:text-red-500"
+                        className="text-smoke hover:text-flix-red transition"
                       >
                         Delete
                       </button>
@@ -200,27 +203,27 @@ export default function SeasonEpisodeManager({ movieId, seasons, onSeasonsChange
             )}
 
             {expandedSeasonId === season.id && (
-              <div className="mt-3 bg-neutral-900 rounded p-3 space-y-2">
+              <div className="mt-3 bg-panel rounded p-3 space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   <input
                     type="number"
                     placeholder="Episode #"
                     value={episodeForm.episode_number}
                     onChange={(e) => setEpisodeForm({ ...episodeForm, episode_number: e.target.value })}
-                    className="bg-neutral-800 rounded px-3 py-2 outline-none focus:ring-2 focus:ring-red-600"
+                    className={inputClass}
                   />
                   <input
                     type="text"
                     placeholder="Title"
                     value={episodeForm.title}
                     onChange={(e) => setEpisodeForm({ ...episodeForm, title: e.target.value })}
-                    className="bg-neutral-800 rounded px-3 py-2 outline-none focus:ring-2 focus:ring-red-600"
+                    className={inputClass}
                   />
                   <textarea
                     placeholder="Description"
                     value={episodeForm.description}
                     onChange={(e) => setEpisodeForm({ ...episodeForm, description: e.target.value })}
-                    className="bg-neutral-800 rounded px-3 py-2 col-span-2 outline-none focus:ring-2 focus:ring-red-600"
+                    className={`${inputClass} col-span-2`}
                     rows={2}
                   />
                   <input
@@ -228,35 +231,35 @@ export default function SeasonEpisodeManager({ movieId, seasons, onSeasonsChange
                     placeholder="Duration (minutes)"
                     value={episodeForm.duration}
                     onChange={(e) => setEpisodeForm({ ...episodeForm, duration: e.target.value })}
-                    className="bg-neutral-800 rounded px-3 py-2 outline-none focus:ring-2 focus:ring-red-600"
+                    className={inputClass}
                   />
                   <input
                     type="text"
                     placeholder="Video URL"
                     value={episodeForm.video_url}
                     onChange={(e) => setEpisodeForm({ ...episodeForm, video_url: e.target.value })}
-                    className="bg-neutral-800 rounded px-3 py-2 outline-none focus:ring-2 focus:ring-red-600"
+                    className={inputClass}
                   />
                   <input
                     type="text"
                     placeholder="Thumbnail URL"
                     value={episodeForm.thumbnail_url}
                     onChange={(e) => setEpisodeForm({ ...episodeForm, thumbnail_url: e.target.value })}
-                    className="bg-neutral-800 rounded px-3 py-2 col-span-2 outline-none focus:ring-2 focus:ring-red-600"
+                    className={`${inputClass} col-span-2`}
                   />
                 </div>
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => handleSaveEpisode(season.id)}
-                    className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded font-medium text-sm"
+                    className="bg-flix-red hover:bg-flix-red-dim text-reel px-4 py-2 rounded font-semibold text-sm transition"
                   >
                     {editingEpisodeId ? 'Save Episode' : 'Create Episode'}
                   </button>
                   <button
                     type="button"
                     onClick={() => setExpandedSeasonId(null)}
-                    className="border border-neutral-600 px-4 py-2 rounded text-sm text-neutral-300 hover:text-white"
+                    className="border border-panel-line px-4 py-2 rounded text-sm text-smoke hover:text-reel transition"
                   >
                     Cancel
                   </button>

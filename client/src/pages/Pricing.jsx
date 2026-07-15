@@ -28,17 +28,17 @@ export default function Pricing() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white px-4 md:px-8 py-10">
-      <button onClick={() => navigate(-1)} className="text-neutral-300 hover:text-white mb-6">
+    <div className="min-h-screen bg-void text-reel px-4 md:px-8 py-10 font-display">
+      <button onClick={() => navigate(-1)} className="text-smoke hover:text-reel mb-6 transition">
         ← Back
       </button>
 
-      <h1 className="text-3xl md:text-4xl font-bold mb-2">Choose your plan</h1>
-      <p className="text-neutral-400 mb-8">
-        Current plan: <span className="text-white capitalize">{user?.subscription_plan || 'free'}</span>
+      <h1 className="text-3xl md:text-4xl font-extrabold mb-2">Choose your plan</h1>
+      <p className="text-smoke mb-8">
+        Current plan: <span className="text-reel capitalize">{user?.subscription_plan || 'free'}</span>
       </p>
 
-      {error && <p className="text-orange-400 mb-6">{error}</p>}
+      {error && <p className="text-flix-red mb-6">{error}</p>}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl">
         {PLANS.map((plan) => {
@@ -46,29 +46,29 @@ export default function Pricing() {
           return (
             <div
               key={plan.id}
-              className={`bg-neutral-900 rounded-lg p-6 border ${
-                isCurrent ? 'border-red-600' : 'border-neutral-800'
+              className={`bg-panel rounded-lg p-6 border ${
+                isCurrent ? 'border-flix-red' : 'border-panel-line'
               }`}
             >
-              <h2 className="text-xl font-bold mb-1">{plan.name}</h2>
-              <p className="text-3xl font-bold mb-4">
+              <h2 className="text-xl font-extrabold mb-1">{plan.name}</h2>
+              <p className="text-3xl font-extrabold mb-4">
                 {plan.price}
-                <span className="text-sm text-neutral-400 font-normal">/month</span>
+                <span className="text-sm text-smoke font-normal">/month</span>
               </p>
               <ul className="space-y-2 mb-6">
                 {plan.features.map((f) => (
-                  <li key={f} className="text-neutral-300 text-sm flex gap-2">
-                    <span className="text-red-500">✓</span> {f}
+                  <li key={f} className="text-smoke text-sm flex gap-2">
+                    <span className="text-flix-red">✓</span> {f}
                   </li>
                 ))}
               </ul>
               <button
                 onClick={() => handleSubscribe(plan.id)}
                 disabled={isCurrent || loadingPlan !== null}
-                className={`w-full py-3 rounded font-semibold transition ${
+                className={`w-full py-3 rounded font-bold transition ${
                   isCurrent
-                    ? 'bg-neutral-700 text-neutral-400 cursor-not-allowed'
-                    : 'bg-red-600 hover:bg-red-700 text-white'
+                    ? 'bg-void-soft text-smoke cursor-not-allowed'
+                    : 'bg-flix-red hover:bg-flix-red-dim text-reel'
                 }`}
               >
                 {isCurrent ? 'Current Plan' : loadingPlan === plan.id ? 'Redirecting...' : 'Subscribe'}

@@ -24,21 +24,29 @@ export default function ActorDetail() {
   }, [castId])
 
   if (isLoading) {
-    return <div className="min-h-screen bg-black text-white flex items-center justify-center">Loading...</div>
+    return (
+      <div className="min-h-screen bg-void text-reel flex items-center justify-center font-display">
+        Loading...
+      </div>
+    )
   }
 
   if (!cast) {
-    return <div className="min-h-screen bg-black text-white flex items-center justify-center">Cast member not found</div>
+    return (
+      <div className="min-h-screen bg-void text-reel flex items-center justify-center font-display">
+        Cast member not found
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-black text-white px-4 md:px-8 py-10">
-      <button onClick={() => navigate(-1)} className="text-neutral-300 hover:text-white mb-6">
+    <div className="min-h-screen bg-void text-reel px-4 md:px-8 py-10 font-display">
+      <button onClick={() => navigate(-1)} className="text-smoke hover:text-reel mb-6 transition">
         ← Back
       </button>
 
       <div className="flex flex-col md:flex-row items-start gap-8 mb-10">
-        <div className="w-40 h-40 rounded-full overflow-hidden bg-neutral-800 flex items-center justify-center shrink-0">
+        <div className="w-40 h-40 rounded-full overflow-hidden bg-panel border border-panel-line flex items-center justify-center shrink-0">
           {cast.photo_url ? (
             <img src={cast.photo_url} alt={cast.name} className="w-full h-full object-cover" />
           ) : (
@@ -46,16 +54,16 @@ export default function ActorDetail() {
           )}
         </div>
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">{cast.name}</h1>
-          <p className="text-neutral-400">
+          <h1 className="text-3xl md:text-4xl font-extrabold mb-2">{cast.name}</h1>
+          <p className="text-smoke">
             Appears in {cast.movies.length} title{cast.movies.length === 1 ? '' : 's'}
           </p>
         </div>
       </div>
 
-      <h2 className="text-xl font-bold mb-4">Titles</h2>
+      <h2 className="text-xl font-extrabold mb-4">Titles</h2>
       {cast.movies.length === 0 ? (
-        <p className="text-neutral-400">No titles found for this cast member yet.</p>
+        <p className="text-smoke">No titles found for this cast member yet.</p>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {cast.movies.map((movie) => (
@@ -64,16 +72,16 @@ export default function ActorDetail() {
               onClick={() => navigate(`/movie/${movie.id}`)}
               className="cursor-pointer group"
             >
-              <div className="aspect-video bg-neutral-800 rounded overflow-hidden group-hover:ring-2 ring-white transition">
+              <div className="aspect-video bg-panel rounded overflow-hidden border border-panel-line group-hover:ring-2 ring-flix-red group-hover:border-transparent transition">
                 {movie.thumbnail_url ? (
                   <img src={movie.thumbnail_url} alt={movie.title} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-neutral-500 text-sm text-center px-2">
+                  <div className="w-full h-full flex items-center justify-center text-smoke text-sm text-center px-2">
                     {movie.title}
                   </div>
                 )}
               </div>
-              <p className="text-neutral-300 text-sm mt-1 truncate group-hover:text-white">{movie.title}</p>
+              <p className="text-smoke text-sm mt-1 truncate group-hover:text-reel transition">{movie.title}</p>
             </div>
           ))}
         </div>

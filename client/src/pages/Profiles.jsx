@@ -43,14 +43,19 @@ export default function Profiles() {
   }
 
   if (isLoading) {
-    return <div className="min-h-screen bg-black text-white flex items-center justify-center">Loading...</div>
+    return (
+      <div className="min-h-screen bg-void text-reel flex items-center justify-center font-display">
+        Loading...
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4">
-      <h1 className="text-4xl font-bold mb-10">Who's watching?</h1>
+    <div className="min-h-screen bg-void text-reel flex flex-col items-center justify-center px-4 font-display">
+      <p className="text-flix-red text-xs font-bold tracking-[0.35em] uppercase mb-3">Flixtape</p>
+      <h1 className="text-4xl font-extrabold mb-10">Who&apos;s watching?</h1>
 
-      {error && <p className="text-orange-400 mb-4">{error}</p>}
+      {error && <p className="text-flix-red mb-4">{error}</p>}
 
       <div className="flex flex-wrap justify-center gap-6 mb-10 max-w-2xl">
         {profiles.map((profile) => (
@@ -59,7 +64,7 @@ export default function Profiles() {
             onClick={() => handleSelect(profile)}
             className="flex flex-col items-center gap-2 cursor-pointer group"
           >
-            <div className="relative w-24 h-24 md:w-32 md:h-32 rounded overflow-hidden bg-neutral-700 flex items-center justify-center text-3xl font-bold group-hover:ring-4 ring-white transition">
+            <div className="relative w-24 h-24 md:w-32 md:h-32 rounded overflow-hidden bg-panel border border-panel-line flex items-center justify-center text-3xl font-bold group-hover:ring-4 ring-flix-red transition">
               {profile.avatar_url ? (
                 <img src={profile.avatar_url} alt={profile.name} className="w-full h-full object-cover" />
               ) : (
@@ -68,13 +73,13 @@ export default function Profiles() {
               {isManaging && (
                 <button
                   onClick={(e) => handleDelete(profile.id, e)}
-                  className="absolute inset-0 bg-black/70 flex items-center justify-center text-red-500 font-bold"
+                  className="absolute inset-0 bg-void/80 flex items-center justify-center text-flix-red font-bold"
                 >
                   Remove
                 </button>
               )}
             </div>
-            <span className="text-neutral-300 group-hover:text-white">{profile.name}</span>
+            <span className="text-smoke group-hover:text-reel transition">{profile.name}</span>
           </div>
         ))}
 
@@ -83,10 +88,10 @@ export default function Profiles() {
             onClick={() => setIsAdding(true)}
             className="flex flex-col items-center gap-2 cursor-pointer group"
           >
-            <div className="w-24 h-24 md:w-32 md:h-32 rounded bg-neutral-800 flex items-center justify-center text-5xl text-neutral-500 group-hover:text-white group-hover:ring-4 ring-white transition">
+            <div className="w-24 h-24 md:w-32 md:h-32 rounded bg-panel border border-panel-line flex items-center justify-center text-5xl text-smoke group-hover:text-reel group-hover:ring-4 ring-flix-red transition">
               +
             </div>
-            <span className="text-neutral-400 group-hover:text-white">Add Profile</span>
+            <span className="text-smoke group-hover:text-reel transition">Add Profile</span>
           </div>
         )}
       </div>
@@ -94,41 +99,41 @@ export default function Profiles() {
       <div className="flex gap-4">
         <button
           onClick={() => setIsManaging((prev) => !prev)}
-          className="border border-neutral-500 text-neutral-300 px-6 py-2 rounded hover:border-white hover:text-white transition"
+          className="border border-panel-line text-smoke px-6 py-2 rounded hover:border-flix-red hover:text-reel transition"
         >
           {isManaging ? 'Done' : 'Manage Profiles'}
         </button>
         <button
           onClick={logout}
-          className="text-neutral-400 hover:text-white transition"
+          className="text-smoke hover:text-reel transition"
         >
           Log out
         </button>
       </div>
 
       {isAdding && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center px-4">
-          <form onSubmit={handleAddProfile} className="bg-neutral-900 p-8 rounded-md w-full max-w-sm">
-            <h2 className="text-white text-xl font-bold mb-4">Add Profile</h2>
+        <div className="fixed inset-0 bg-void/85 flex items-center justify-center px-4">
+          <form onSubmit={handleAddProfile} className="bg-panel border border-panel-line p-8 rounded-md w-full max-w-sm">
+            <h2 className="text-reel text-xl font-extrabold mb-4">Add Profile</h2>
             <input
               type="text"
               placeholder="Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-neutral-800 text-white rounded px-4 py-3 outline-none focus:ring-2 focus:ring-red-600 mb-4"
+              className="w-full bg-void border border-panel-line text-reel placeholder-smoke rounded px-4 py-3 outline-none focus:border-flix-red focus:ring-1 focus:ring-flix-red mb-4 transition"
               required
             />
             <div className="flex gap-3">
               <button
                 type="submit"
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold rounded px-4 py-3"
+                className="flex-1 bg-flix-red hover:bg-flix-red-dim text-reel font-bold rounded px-4 py-3 transition"
               >
                 Create
               </button>
               <button
                 type="button"
                 onClick={() => setIsAdding(false)}
-                className="flex-1 border border-neutral-500 text-neutral-300 rounded px-4 py-3 hover:text-white"
+                className="flex-1 border border-panel-line text-smoke rounded px-4 py-3 hover:text-reel transition"
               >
                 Cancel
               </button>

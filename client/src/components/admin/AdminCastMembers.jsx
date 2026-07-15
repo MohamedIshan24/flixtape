@@ -49,7 +49,7 @@ export default function AdminCastMembers() {
 
   return (
     <div>
-      {error && <p className="text-orange-400 mb-4">{error}</p>}
+      {error && <p className="text-flix-red mb-4">{error}</p>}
 
       <form onSubmit={handleCreate} className="flex gap-2 mb-6 flex-wrap">
         <input
@@ -57,7 +57,7 @@ export default function AdminCastMembers() {
           placeholder="Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="bg-neutral-800 text-white rounded px-4 py-2 outline-none focus:ring-2 focus:ring-red-600"
+          className="bg-void border border-panel-line text-reel placeholder-smoke rounded px-4 py-2 outline-none focus:border-flix-red focus:ring-1 focus:ring-flix-red transition"
           required
         />
         <input
@@ -65,37 +65,37 @@ export default function AdminCastMembers() {
           placeholder="Photo URL (optional)"
           value={photoUrl}
           onChange={(e) => setPhotoUrl(e.target.value)}
-          className="bg-neutral-800 text-white rounded px-4 py-2 outline-none focus:ring-2 focus:ring-red-600 flex-1 max-w-xs"
+          className="bg-void border border-panel-line text-reel placeholder-smoke rounded px-4 py-2 outline-none focus:border-flix-red focus:ring-1 focus:ring-flix-red flex-1 max-w-xs transition"
         />
-        <button type="submit" className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-medium">
+        <button type="submit" className="bg-flix-red hover:bg-flix-red-dim text-reel px-4 py-2 rounded font-semibold transition">
           Add Cast Member
         </button>
       </form>
 
       {isLoading ? (
-        <p className="text-neutral-400">Loading...</p>
+        <p className="text-smoke">Loading...</p>
       ) : castMembers.length === 0 ? (
-        <div className="flex flex-col items-center justify-center text-center py-16 border border-dashed border-neutral-700 rounded">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-10 h-10 text-neutral-600 mb-3">
+        <div className="flex flex-col items-center justify-center text-center py-16 border border-dashed border-panel-line rounded">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-10 h-10 text-panel-line mb-3">
             <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
           </svg>
-          <p className="text-neutral-400 text-sm">No cast members yet. Add your first one above.</p>
+          <p className="text-smoke text-sm">No cast members yet. Add your first one above.</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {castMembers.map((cast) => (
-            <div key={cast.id} className="bg-neutral-800 rounded p-3 flex flex-col items-center gap-2">
-              <div className="w-16 h-16 rounded-full bg-neutral-700 overflow-hidden flex items-center justify-center">
+            <div key={cast.id} className="bg-void-soft border border-panel-line rounded p-3 flex flex-col items-center gap-2">
+              <div className="w-16 h-16 rounded-full bg-panel overflow-hidden flex items-center justify-center">
                 {cast.photo_url ? (
                   <img src={cast.photo_url} alt={cast.name} className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-lg">{cast.name.charAt(0)}</span>
+                  <span className="text-lg text-reel">{cast.name.charAt(0)}</span>
                 )}
               </div>
-              <span className="text-sm text-center">{cast.name}</span>
+              <span className="text-sm text-center text-reel">{cast.name}</span>
               <button
                 onClick={() => handleDelete(cast.id)}
-                className="text-xs text-neutral-400 hover:text-red-500"
+                className="text-xs text-smoke hover:text-flix-red transition"
               >
                 Remove
               </button>

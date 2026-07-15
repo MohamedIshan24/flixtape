@@ -16,10 +16,10 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('movies')
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="flex items-center justify-between px-4 md:px-8 py-4 border-b border-neutral-800">
-        <h1 className="text-2xl font-bold">Manage Content</h1>
-        <Link to="/browse" className="text-neutral-400 hover:text-white text-sm">
+    <div className="min-h-screen bg-void text-reel font-display">
+      <div className="flex items-center justify-between px-4 md:px-8 py-4 border-b border-panel-line">
+        <h1 className="text-2xl font-extrabold">Manage Content</h1>
+        <Link to="/browse" className="text-smoke hover:text-reel text-sm transition">
           ← Back to Browse
         </Link>
       </div>
@@ -29,10 +29,10 @@ export default function AdminDashboard() {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 rounded-t font-medium transition ${
+            className={`px-4 py-2 rounded-t font-semibold transition ${
               activeTab === tab.key
-                ? 'bg-neutral-900 text-white border-b-2 border-red-600'
-                : 'text-neutral-400 hover:text-white'
+                ? 'bg-panel text-reel border-b-2 border-flix-red'
+                : 'text-smoke hover:text-reel'
             }`}
           >
             {tab.label}
@@ -40,7 +40,7 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      <div className="bg-neutral-900 px-4 md:px-8 py-6">
+      <div className="bg-panel px-4 md:px-8 py-6">
         {activeTab === 'movies' && <AdminMovies />}
         {activeTab === 'genres' && <AdminGenres />}
         {activeTab === 'cast' && <AdminCastMembers />}

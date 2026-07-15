@@ -110,7 +110,11 @@ export default function EpisodeDetail() {
   }
 
   if (isLoading || !movie || !episode || !season) {
-    return <div className="min-h-screen bg-black text-white flex items-center justify-center">Loading...</div>
+    return (
+      <div className="min-h-screen bg-void text-reel flex items-center justify-center font-display">
+        Loading...
+      </div>
+    )
   }
 
   const episodeIndex = season.episodes.findIndex((e) => e.id === episodeId)
@@ -118,15 +122,15 @@ export default function EpisodeDetail() {
   const nextEpisode = episodeIndex < season.episodes.length - 1 ? season.episodes[episodeIndex + 1] : null
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-void text-reel font-display">
       <div className="px-4 md:px-8 py-4">
-        <button onClick={() => navigate(-1)} className="text-neutral-300 hover:text-white">
+        <button onClick={() => navigate(-1)} className="text-smoke hover:text-reel transition">
           ← Back to {movie.title}
         </button>
       </div>
 
       <div className="px-4 md:px-8">
-        <div className="aspect-video bg-neutral-900 rounded overflow-hidden mb-6 relative">
+        <div className="aspect-video bg-panel rounded overflow-hidden mb-6 relative border border-panel-line">
           {episode.video_url ? (
             <ReactPlayer
               key={episode.id}
@@ -147,51 +151,51 @@ export default function EpisodeDetail() {
           ) : episode.thumbnail_url ? (
             <div className="w-full h-full relative">
               <img src={episode.thumbnail_url} alt={episode.title} className="w-full h-full object-cover opacity-40" />
-              <div className="absolute inset-0 flex items-center justify-center text-neutral-300 text-sm bg-black/30">
+              <div className="absolute inset-0 flex items-center justify-center text-smoke text-sm bg-void/40">
                 No video available for this episode yet
               </div>
             </div>
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-neutral-500">
+            <div className="w-full h-full flex items-center justify-center text-smoke">
               No video available for this episode yet
             </div>
           )}
         </div>
 
         <div className="max-w-3xl mb-8">
-          <p className="text-neutral-400 text-sm mb-1">
+          <p className="text-smoke text-sm mb-1">
             {movie.title} · Season {season.season_number}
           </p>
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">
+          <h1 className="text-2xl md:text-3xl font-extrabold mb-2">
             {episode.episode_number}. {episode.title}
           </h1>
-          <div className="flex items-center gap-3 text-neutral-400 text-sm mb-4">
+          <div className="flex items-center gap-3 text-smoke text-sm mb-4">
             {episode.duration && <span>{episode.duration} min</span>}
           </div>
           {episode.description && (
-            <p className="text-neutral-200 mb-6">{episode.description}</p>
+            <p className="text-smoke mb-6">{episode.description}</p>
           )}
 
           <div className="flex items-center gap-6">
             <div>
-              <p className="text-neutral-500 text-xs mb-1">
+              <p className="text-smoke/70 text-xs mb-1">
                 {myEpisodeRating > 0 ? 'Your rating' : 'Rate this episode'}
               </p>
               <StarRating value={myEpisodeRating} onChange={handleRateEpisode} size="text-xl" />
             </div>
             {episodeSummary && (
-              <span className="text-neutral-400 text-sm">
+              <span className="text-smoke text-sm">
                 {episodeSummary.rating_count} rating{episodeSummary.rating_count === 1 ? '' : 's'}
               </span>
             )}
           </div>
         </div>
 
-        <div className="max-w-3xl flex justify-between pb-10">
+        <div className="max-w-3xl flex justify-between pb-10 border-t border-panel-line pt-6">
           {prevEpisode ? (
             <button
               onClick={() => goToEpisode(prevEpisode.id)}
-              className="text-neutral-300 hover:text-white text-sm"
+              className="text-smoke hover:text-flix-red text-sm transition"
             >
               ← Previous Episode
             </button>
@@ -199,7 +203,7 @@ export default function EpisodeDetail() {
           {nextEpisode ? (
             <button
               onClick={() => goToEpisode(nextEpisode.id)}
-              className="text-neutral-300 hover:text-white text-sm"
+              className="text-smoke hover:text-flix-red text-sm transition"
             >
               Next Episode →
             </button>

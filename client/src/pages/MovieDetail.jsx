@@ -7,6 +7,8 @@ import { upsertRating, getRating } from '../api/ratings'
 import { getSeasonRatingSummary, getSeriesRatingSummary } from '../api/episodeRatings'
 import { useProfiles } from '../context/ProfileContext'
 import StarRating from '../components/StarRating'
+import BackgroundVideo from '../components/BackgroundVideo'
+import Footer from '../components/Footer'
 
 export default function MovieDetail() {
   const { movieId } = useParams()
@@ -127,7 +129,8 @@ export default function MovieDetail() {
   const posterUrl = movie.thumbnail_url || movie.banner_url
 
   return (
-    <div className="min-h-screen bg-void text-reel font-display">
+    <div className="min-h-screen bg-void text-reel font-display relative">
+      <BackgroundVideo />
       <div className="px-4 md:px-8 py-4">
         <button onClick={() => navigate(-1)} className="text-smoke hover:text-reel mb-4 transition">
           ← Back
@@ -159,7 +162,7 @@ export default function MovieDetail() {
           </div>
         )}
 
-        <div className="max-w-5xl flex flex-col md:flex-row items-start gap-8 mb-6">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-start gap-8 mb-6">
           {posterUrl && (
             <div className="w-40 md:w-48 shrink-0">
               <img src={posterUrl} alt={movie.title} className="w-full rounded shadow-lg border border-panel-line" />
@@ -234,7 +237,7 @@ export default function MovieDetail() {
         </div>
 
         {isSeries && movie.seasons?.length > 0 && (
-          <div className="max-w-3xl mt-10 mb-10">
+          <div className="max-w-3xl mx-auto mt-10 mb-10">
             <h2 className="text-xl font-extrabold mb-4">Episodes</h2>
 
             <div className="flex flex-wrap gap-2 mb-6">
@@ -304,6 +307,7 @@ export default function MovieDetail() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   )
 }

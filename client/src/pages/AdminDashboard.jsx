@@ -4,6 +4,8 @@ import AdminGenres from '../components/admin/AdminGenres'
 import AdminCastMembers from '../components/admin/AdminCastMembers'
 import AdminAnalytics from '../components/admin/AdminAnalytics'
 import { Link } from 'react-router-dom'
+import BackgroundVideo from '../components/BackgroundVideo'
+import Footer from '../components/Footer'
 
 const TABS = [
   { key: 'movies', label: 'Movies' },
@@ -16,7 +18,8 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('movies')
 
   return (
-    <div className="min-h-screen bg-void text-reel font-display">
+    <div className="min-h-screen bg-void text-reel font-display relative">
+      <BackgroundVideo />
       <div className="flex items-center justify-between px-4 md:px-8 py-4 border-b border-panel-line">
         <h1 className="text-2xl font-extrabold">Manage Content</h1>
         <Link to="/browse" className="text-smoke hover:text-reel text-sm transition">
@@ -46,6 +49,7 @@ export default function AdminDashboard() {
         {activeTab === 'cast' && <AdminCastMembers />}
         {activeTab === 'analytics' && <AdminAnalytics />}
       </div>
+      <Footer />
     </div>
   )
 }

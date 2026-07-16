@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useProfiles } from '../context/ProfileContext'
 import { createProfile as createProfileApi, deleteProfile as deleteProfileApi } from '../api/profiles'
 import { useAuth } from '../context/AuthContext'
+import BackgroundVideo from '../components/BackgroundVideo'
+import Footer from '../components/Footer'
 
 export default function Profiles() {
   const { profiles, isLoading, selectProfile, addProfile, removeProfile } = useProfiles()
@@ -51,96 +53,100 @@ export default function Profiles() {
   }
 
   return (
-    <div className="min-h-screen bg-void text-reel flex flex-col items-center justify-center px-4 font-display">
-      <p className="text-flix-red text-xs font-bold tracking-[0.35em] uppercase mb-3">Flixtape</p>
-      <h1 className="text-4xl font-extrabold mb-10">Who&apos;s watching?</h1>
+    <div className="min-h-screen text-reel flex flex-col font-display relative">
+      <BackgroundVideo />
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-16">
+        <p className="text-flix-red text-xs font-bold tracking-[0.35em] uppercase mb-3">Flixtape</p>
+        <h1 className="text-4xl font-extrabold mb-10">Who&apos;s watching?</h1>
 
-      {error && <p className="text-flix-red mb-4">{error}</p>}
+        {error && <p className="text-flix-red mb-4">{error}</p>}
 
-      <div className="flex flex-wrap justify-center gap-6 mb-10 max-w-2xl">
-        {profiles.map((profile) => (
-          <div
-            key={profile.id}
-            onClick={() => handleSelect(profile)}
-            className="flex flex-col items-center gap-2 cursor-pointer group"
+        <div className="flex flex-wrap justify-center gap-6 mb-10 max-w-2xl">
+          {profiles.map((profile) => (
+            <div
+              key={profile.id}
+              onClick={() => handleSelect(profile)}
+              className="flex flex-col items-center gap-2 cursor-pointer group"
+            >
+              <div className="relative w-24 h-24 md:w-32 md:h-32 rounded overflow-hidden bg-panel border border-panel-line flex items-center justify-center text-3xl font-bold group-hover:ring-4 ring-flix-red transition">
+                {profile.avatar_url ? (
+                  <img src={profile.avatar_url} alt={profile.name} className="w-full h-full object-cover" />
+                ) : (
+                  profile.name.charAt(0).toUpperCase()
+                )}
+                {isManaging && (
+                  <button
+                    onClick={(e) => handleDelete(profile.id, e)}
+                    className="absolute inset-0 bg-void/80 flex items-center justify-center text-flix-red font-bold"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+              <span className="text-smoke group-hover:text-reel transition">{profile.name}</span>
+            </div>
+          ))}
+
+          {profiles.length < 5 && (
+            <div
+              onClick={() => setIsAdding(true)}
+              className="flex flex-col items-center gap-2 cursor-pointer group"
+            >
+              <div className="w-24 h-24 md:w-32 md:h-32 rounded bg-panel border border-panel-line flex items-center justify-center text-5xl text-smoke group-hover:text-reel group-hover:ring-4 ring-flix-red transition">
+                +
+              </div>
+              <span className="text-smoke group-hover:text-reel transition">Add Profile</span>
+            </div>
+          )}
+        </div>
+
+        <div className="flex gap-4">
+          <button
+            onClick={() => setIsManaging((prev) => !prev)}
+            className="border border-panel-line text-smoke px-6 py-2 rounded hover:border-flix-red hover:text-reel transition"
           >
-            <div className="relative w-24 h-24 md:w-32 md:h-32 rounded overflow-hidden bg-panel border border-panel-line flex items-center justify-center text-3xl font-bold group-hover:ring-4 ring-flix-red transition">
-              {profile.avatar_url ? (
-                <img src={profile.avatar_url} alt={profile.name} className="w-full h-full object-cover" />
-              ) : (
-                profile.name.charAt(0).toUpperCase()
-              )}
-              {isManaging && (
+            {isManaging ? 'Done' : 'Manage Profiles'}
+          </button>
+          <button
+            onClick={logout}
+            className="text-smoke hover:text-reel transition"
+          >
+            Log out
+          </button>
+        </div>
+
+        {isAdding && (
+          <div className="fixed inset-0 bg-void/85 flex items-center justify-center px-4 z-20">
+            <form onSubmit={handleAddProfile} className="bg-panel border border-panel-line p-8 rounded-md w-full max-w-sm">
+              <h2 className="text-reel text-xl font-extrabold mb-4">Add Profile</h2>
+              <input
+                type="text"
+                placeholder="Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full bg-void border border-panel-line text-reel placeholder-smoke rounded px-4 py-3 outline-none focus:border-flix-red focus:ring-1 focus:ring-flix-red mb-4 transition"
+                required
+              />
+              <div className="flex gap-3">
                 <button
-                  onClick={(e) => handleDelete(profile.id, e)}
-                  className="absolute inset-0 bg-void/80 flex items-center justify-center text-flix-red font-bold"
+                  type="submit"
+                  className="flex-1 bg-flix-red hover:bg-flix-red-dim text-reel font-bold rounded px-4 py-3 transition"
                 >
-                  Remove
+                  Create
                 </button>
-              )}
-            </div>
-            <span className="text-smoke group-hover:text-reel transition">{profile.name}</span>
-          </div>
-        ))}
-
-        {profiles.length < 5 && (
-          <div
-            onClick={() => setIsAdding(true)}
-            className="flex flex-col items-center gap-2 cursor-pointer group"
-          >
-            <div className="w-24 h-24 md:w-32 md:h-32 rounded bg-panel border border-panel-line flex items-center justify-center text-5xl text-smoke group-hover:text-reel group-hover:ring-4 ring-flix-red transition">
-              +
-            </div>
-            <span className="text-smoke group-hover:text-reel transition">Add Profile</span>
+                <button
+                  type="button"
+                  onClick={() => setIsAdding(false)}
+                  className="flex-1 border border-panel-line text-smoke rounded px-4 py-3 hover:text-reel transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         )}
       </div>
-
-      <div className="flex gap-4">
-        <button
-          onClick={() => setIsManaging((prev) => !prev)}
-          className="border border-panel-line text-smoke px-6 py-2 rounded hover:border-flix-red hover:text-reel transition"
-        >
-          {isManaging ? 'Done' : 'Manage Profiles'}
-        </button>
-        <button
-          onClick={logout}
-          className="text-smoke hover:text-reel transition"
-        >
-          Log out
-        </button>
-      </div>
-
-      {isAdding && (
-        <div className="fixed inset-0 bg-void/85 flex items-center justify-center px-4">
-          <form onSubmit={handleAddProfile} className="bg-panel border border-panel-line p-8 rounded-md w-full max-w-sm">
-            <h2 className="text-reel text-xl font-extrabold mb-4">Add Profile</h2>
-            <input
-              type="text"
-              placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full bg-void border border-panel-line text-reel placeholder-smoke rounded px-4 py-3 outline-none focus:border-flix-red focus:ring-1 focus:ring-flix-red mb-4 transition"
-              required
-            />
-            <div className="flex gap-3">
-              <button
-                type="submit"
-                className="flex-1 bg-flix-red hover:bg-flix-red-dim text-reel font-bold rounded px-4 py-3 transition"
-              >
-                Create
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsAdding(false)}
-                className="flex-1 border border-panel-line text-smoke rounded px-4 py-3 hover:text-reel transition"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+      <Footer />
     </div>
   )
 }

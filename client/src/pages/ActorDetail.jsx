@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getCastMember } from '../api/castMembers'
+import BackgroundVideo from '../components/BackgroundVideo'
+import Footer from '../components/Footer'
 
 export default function ActorDetail() {
   const { castId } = useParams()
@@ -40,7 +42,8 @@ export default function ActorDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-void text-reel px-4 md:px-8 py-10 font-display">
+    <div className="min-h-screen bg-void text-reel px-4 md:px-8 py-10 font-display relative">
+      <BackgroundVideo />
       <button onClick={() => navigate(-1)} className="text-smoke hover:text-reel mb-6 transition">
         ← Back
       </button>
@@ -86,6 +89,7 @@ export default function ActorDetail() {
           ))}
         </div>
       )}
+      <Footer />
     </div>
   )
 }

@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createCheckoutSession } from '../api/billing'
 import { useAuth } from '../context/AuthContext'
+import BackgroundVideo from '../components/BackgroundVideo'
+import Footer from '../components/Footer'
 
 const PLANS = [
   { id: 'basic', name: 'Basic', price: '$8.99', features: ['720p streaming', '1 device at a time', 'Watch on your phone, tablet, or laptop'] },
@@ -28,7 +30,8 @@ export default function Pricing() {
   }
 
   return (
-    <div className="min-h-screen bg-void text-reel px-4 md:px-8 py-10 font-display">
+    <div className="min-h-screen bg-void text-reel px-4 md:px-8 py-10 font-display relative">
+      <BackgroundVideo />
       <button onClick={() => navigate(-1)} className="text-smoke hover:text-reel mb-6 transition">
         ← Back
       </button>
@@ -77,6 +80,7 @@ export default function Pricing() {
           )
         })}
       </div>
+      <Footer />
     </div>
   )
 }

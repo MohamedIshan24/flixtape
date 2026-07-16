@@ -8,6 +8,8 @@ import Navbar from '../components/Navbar'
 import MovieRow from '../components/MovieRow'
 import HeroSkeleton from '../components/skeletons/HeroSkeleton'
 import MovieRowSkeleton from '../components/skeletons/MovieRowSkeleton'
+import BackgroundVideo from '../components/BackgroundVideo'
+import Footer from '../components/Footer'
 
 export default function Browse() {
   const { activeProfile } = useProfiles()
@@ -114,7 +116,8 @@ export default function Browse() {
   const visibleGenres = genres.filter((genre) => (genreMovies[genre.id]?.length ?? 0) > 0)
 
   return (
-    <div className="min-h-screen bg-void font-display">
+    <div className="min-h-screen bg-void font-display relative">
+      <BackgroundVideo />
       <Navbar onSearch={handleSearch} />
 
       {searchResults !== null ? (
@@ -167,6 +170,7 @@ export default function Browse() {
           ))}
         </>
       )}
+      <Footer />
     </div>
   )
 }

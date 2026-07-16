@@ -10,6 +10,8 @@ import {
 } from '../api/episodeRatings'
 import { useProfiles } from '../context/ProfileContext'
 import StarRating from '../components/StarRating'
+import BackgroundVideo from '../components/BackgroundVideo'
+import Footer from '../components/Footer'
 
 export default function EpisodeDetail() {
   const { movieId, episodeId } = useParams()
@@ -122,7 +124,8 @@ export default function EpisodeDetail() {
   const nextEpisode = episodeIndex < season.episodes.length - 1 ? season.episodes[episodeIndex + 1] : null
 
   return (
-    <div className="min-h-screen bg-void text-reel font-display">
+    <div className="min-h-screen bg-void text-reel font-display relative">
+      <BackgroundVideo />
       <div className="px-4 md:px-8 py-4">
         <button onClick={() => navigate(-1)} className="text-smoke hover:text-reel transition">
           ← Back to {movie.title}
@@ -162,7 +165,7 @@ export default function EpisodeDetail() {
           )}
         </div>
 
-        <div className="max-w-3xl mb-8">
+        <div className="max-w-3xl mx-auto mb-8">
           <p className="text-smoke text-sm mb-1">
             {movie.title} · Season {season.season_number}
           </p>
@@ -191,7 +194,7 @@ export default function EpisodeDetail() {
           </div>
         </div>
 
-        <div className="max-w-3xl flex justify-between pb-10 border-t border-panel-line pt-6">
+        <div className="max-w-3xl mx-auto flex justify-between pb-10 border-t border-panel-line pt-6">
           {prevEpisode ? (
             <button
               onClick={() => goToEpisode(prevEpisode.id)}
@@ -210,6 +213,7 @@ export default function EpisodeDetail() {
           ) : <span />}
         </div>
       </div>
+      <Footer />
     </div>
   )
 }

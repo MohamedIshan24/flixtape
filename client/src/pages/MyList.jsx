@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { getMyList, removeFromMyList } from '../api/myList'
 import { useProfiles } from '../context/ProfileContext'
 import Navbar from '../components/Navbar'
+import BackgroundVideo from '../components/BackgroundVideo'
+import Footer from '../components/Footer'
 import { useNavigate } from 'react-router-dom'
 
 export default function MyList() {
@@ -36,7 +38,8 @@ export default function MyList() {
   }
 
   return (
-    <div className="min-h-screen bg-void font-display">
+    <div className="min-h-screen bg-void font-display relative">
+      <BackgroundVideo />
       <Navbar onSearch={() => {}} />
 
       <div className="px-4 md:px-8 py-6">
@@ -102,6 +105,7 @@ export default function MyList() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   )
 }

@@ -49,30 +49,16 @@ export function AuthProvider({ children }) {
   }, [])
 
   async function login(email, password) {
-    dispatch({ type: 'AUTH_START' })
-    try {
-      const res = await loginApi(email, password)
-      const token = res.data.access_token
-      localStorage.setItem('flixtape_token', token)
-      const userRes = await getCurrentUser()
-      dispatch({ type: 'AUTH_SUCCESS', payload: { token, user: userRes.data } })
-    } catch (err) {
-      const message = err.response?.data?.detail || 'Login failed'
-      dispatch({ type: 'AUTH_FAILURE', payload: message })
-      throw err
-    }
+    const res = await loginApi(email, password)
+    const token = res.data.access_token
+    localStorage.setItem('flixtape_token', token)
+    const userRes = await getCurrentUser()
+    dispatch({ type: 'AUTH_SUCCESS', payload: { token, user: userRes.data } })
   }
 
   async function signup(email, password) {
-    dispatch({ type: 'AUTH_START' })
-    try {
-      await signupApi(email, password)
-      await login(email, password)
-    } catch (err) {
-      const message = err.response?.data?.detail || 'Signup failed'
-      dispatch({ type: 'AUTH_FAILURE', payload: message })
-      throw err
-    }
+    await signupApi(email, password)
+    await login(email, password)
   }
 
   function logout() {

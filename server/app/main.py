@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import os
 from app.routers import (auth, profiles, genres, cast_members, movies, watch_history, my_list, seasons, episodes, ratings, billing, analytics, notifications, episode_ratings)
 
 from app.database import engine, Base
@@ -21,10 +22,13 @@ app.include_router(analytics.router)
 app.include_router(notifications.router)
 app.include_router(episode_ratings.router)
 
-# Allow the Vite dev server to talk to this API
+# Allow the configured frontend (Vite dev server locally, or the deployed
+# client URL in production) to talk to this API.
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[FRONTEND_URL],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

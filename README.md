@@ -4,6 +4,15 @@ A full-stack Netflix-style streaming app — profiles, watch history, per-episod
 
 Built as a learning/portfolio project. Not affiliated with Netflix.
 
+## Screenshots:
+![Landing Page](image-6.png)
+![Browse Page](image.png)
+![Movie Detail Page](image-1.png)
+![Episode Detail Page](image-2.png)
+![Admin Dashboard-1](image-3.png)
+![Admin Dashboard-2](image-4.png)
+![Sign-in Page](image-5.png)
+
 ## Tech Stack
 
 **Backend:** FastAPI · PostgreSQL · SQLAlchemy · Alembic · JWT auth (python-jose) · Stripe · Resend (email) · pytest

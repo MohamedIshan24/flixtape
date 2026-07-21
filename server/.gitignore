@@ -3,3 +3,5 @@ venv/
 __pycache__/
 *.pyc
 .pytest_cache/
+seed_movies.py
+seed_specific_series.py

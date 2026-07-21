@@ -16,3 +16,6 @@ client/.env.local
 .vscode/
 .DS_Store
 Thumbs.db
+
+seed_movies.py
+seed_specific_series.py
